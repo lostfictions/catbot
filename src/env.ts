@@ -5,8 +5,6 @@ const env = envalid.cleanEnv(
   process.env,
   {
     DATA_DIR: envalid.str({ default: 'persist' }),
-    HOSTNAME: envalid.str({ devDefault: 'localhost' }),
-    PORT: envalid.num({ devDefault: 8080 }),
     MASTODON_SERVER: envalid.url({ default: 'https://mastodon.social' }),
     MASTODON_TOKEN: envalid.str({ default: '' }),
     TWITTER_TOKEN: envalid.str({ default: '' })
@@ -16,8 +14,6 @@ const env = envalid.cleanEnv(
 
 export const {
   DATA_DIR,
-  HOSTNAME,
-  PORT,
   MASTODON_SERVER,
   MASTODON_TOKEN,
   TWITTER_TOKEN
@@ -32,7 +28,7 @@ const isValidConfiguration = MASTODON_TOKEN || TWITTER_TOKEN
 if(!isValidConfiguration) {
   console.error(`Invalid environment config! Bot will do nothing if no Mastodon or Twitter API token is present.`)
 
-  const varsToCheck : (keyof typeof env)[] = ['MASTODON_TOKEN', 'TWITTER_TOKEN']
+  const varsToCheck: (keyof typeof env)[] = ['MASTODON_TOKEN', 'TWITTER_TOKEN']
   const configInfo = varsToCheck.map(key => `${key}: ${env[key] ? 'OK' : 'NONE'}`).join('\n')
   throw new Error(configInfo)
 }
