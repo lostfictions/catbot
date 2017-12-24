@@ -7,10 +7,8 @@
   "scripts": {
     "start": "node dist/main.js",
     "build": "rm -rf dist/ && tsc",
-    "test": "run-s -l test:*",
-    "test:ts": "tsc --noEmit",
-    "test:tslint": "tslint --project .",
-    "watch:ts": "tsc -w"
+    "test": "tsc --noEmit && tslint --project .",
+    "watch": "tsc -w"
   },
   "author": "s <https://github.com/lostfictions>",
   "license": "AGPL-3.0",
@@ -25,7 +23,6 @@
     "@types/form-data": "^2.2.1",
     "@types/got": "^7.1.6",
     "@types/node": "^8.5.1",
-    "npm-run-all": "^4.1.2",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
   },
