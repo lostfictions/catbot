@@ -1,14 +1,16 @@
 a nice bot 4 u.
 
-dockerized. will toot extremely official heathcliff comics every six hours.
+dockerized. will tweet and toot extremely official heathcliff comics regularly.
 
 
 - `MASTODON_TOKEN`: a Mastodon user API token
-- `TWITTER_TOKEN`: a Twitter user API token
 - `MASTODON_SERVER`: the instance to which API calls should be made (usually
   where the bot user lives.) (default: https://mastodon.social)
+- `TWITTER_CONSUMER_KEY`, `TWITTER_CONSUMER_SECRET`, `TWITTER_ACCESS_KEY`, and
+  `TWITTER_ACCESS_SECRET`: you need all of these guys to make a tweet.
 - `DATA_DIR`: the directory in which to search for raw heathcliff comics.
   (default: 'persist')
+- `INTERVAL_MINUTES`: the interval between each post. (default: 240 minutes)
 
 heathbot uses the [envalid](https://github.com/af/envalid) package which in turn
 wraps [dotenv](https://github.com/motdotla/dotenv), so you can alternately stick
