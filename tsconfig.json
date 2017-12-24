@@ -6,6 +6,7 @@
     "allowJs": true,
     "strict": true,
     "lib":[
+      "dom",
       "es2017"
     ],
     "sourceMap": true,
