@@ -96,18 +96,17 @@ export async function renderToImage(
   // hack: bad typings
   const dest: Jimp = new (Jimp as any)(width, height)
 
-  console.log(typeof dest, dest.bitmap.width, dest.bitmap.height)
-
-  for(let i = gridSizeY - 1; i >= 0; i--) {
-    for(let j = 0; j < gridSizeX; j++) {
-      const partType = grid[j][i]
+  for(let x = 0; x < gridSizeX; x++) {
+    for(let y = 0; y < gridSizeY; y++) {
+      // we have to flip the y again
+      const partType = grid[x][gridSizeY - y - 1]
       const sprite = randomInArray(parts[partType])
-      dest.blit(sprite, sW * j, sH * i)
+      dest.blit(sprite, sW * x, sH * y)
     }
   }
 
   filenameIndex += 1
-  const filename = path.join(outDir, `catbot_${filenameIndex}.jpg`)
+  const filename = path.join(outDir, `catbot_${filenameIndex}.png`)
 
   return new Promise<string>((res, rej) => {
     dest.write(filename, e => {
