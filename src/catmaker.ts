@@ -1,7 +1,7 @@
 import { randomByWeight, randomInt } from './util'
 import { CatParts, CatConfig } from './cat-config'
 
-import { renderToImage } from './render-to-image'
+import { renderToImage, CatInfo } from './render-to-image'
 
 // Lookup table mapping from directions [right, up, left, down]
 // to parts to use and position delta to apply.
@@ -190,7 +190,7 @@ function addCat(
 
 export type CatOptions = Partial<CatConfig>
 
-export async function makeCat(config: CatOptions = {}): Promise<string> {
+export async function makeCat(config: CatOptions = {}): Promise<CatInfo> {
   const defaultConfig: CatConfig = {
     catChance: 50,
     leftChance: 50,
@@ -199,7 +199,7 @@ export async function makeCat(config: CatOptions = {}): Promise<string> {
     minSteps: randomInt(2, 20),
     maxSteps: randomInt(30, 60),
     gridSizeX: 16,
-    gridSizeY: 20
+    gridSizeY: 9
   }
 
   const finalConfig: CatConfig = { ...defaultConfig, ...config }
@@ -219,10 +219,14 @@ export async function makeCat(config: CatOptions = {}): Promise<string> {
   }
 
   let lastAddSucceeded = addCat(grid, turnChance, finalConfig)
+  let catCount = 1
 
   while(Math.random() < finalConfig.catChance / 100 && lastAddSucceeded) {
     lastAddSucceeded = addCat(grid, turnChance, finalConfig)
+    if(lastAddSucceeded) {
+      catCount++
+    }
   }
 
-  return renderToImage(grid, finalConfig)
+  return renderToImage(grid, finalConfig, catCount)
 }

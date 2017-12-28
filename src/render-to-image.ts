@@ -4,7 +4,7 @@ import { tmpdir } from 'os'
 
 import * as Jimp from 'jimp'
 
-import { randomInArray } from './util'
+import { randomInArray, randomInt } from './util'
 import { DATA_DIR } from './env'
 
 import { CatParts, CatConfig } from './cat-config'
@@ -81,14 +81,20 @@ async function loadSprites(): Promise<{ [part: string]: Jimp[] }> {
 
 let filenameIndex = 0
 
+export interface CatInfo {
+  filename: string
+  catsMade: number
+  params: CatConfig
+}
+
 export async function renderToImage(
   grid: CatParts[][],
-  {
-    gridSizeX,
-    gridSizeY
-  }: CatConfig
-): Promise<string> {
+  params: CatConfig,
+  catsMade: number
+): Promise<CatInfo> {
   const parts = await loadSprites()
+
+  const { gridSizeX, gridSizeY } = params
 
   const [sW, sH] = spriteSize
   const width = sW * gridSizeX
@@ -105,16 +111,51 @@ export async function renderToImage(
     }
   }
 
+  ////////////////////
+  // Some transforms:
+  const mirror = Math.random()
+  if(mirror < 0.1) {
+    dest.mirror(true, false)
+  }
+  else if(mirror < 0.14) {
+    dest.mirror(true, true)
+  }
+  else if(mirror < 0.18) {
+    dest.mirror(false, true)
+  }
+
+  if(Math.random() < 0.2) {
+    dest.rotate(180)
+  }
+
+  const getTransform = () => { const val = Math.random(); switch(true) {
+    case val < 0.3: return { apply: 'spin', params: [randomInt(360)] }
+    case val < 0.4: return { apply: 'lighten', params: [randomInt(5, 20)] }
+    case val < 0.5: return { apply: 'brighten', params: [randomInt(5, 20)] }
+    case val < 0.6: return { apply: 'desaturate', params: [randomInt(10, 100)] }
+    case val < 0.7: return { apply: 'tint', params: [randomInt(10, 20)] }
+    case val < 0.8: return { apply: 'red', params: [randomInt(10, 50)] }
+    case val < 0.9: return { apply: 'green', params: [randomInt(10, 50)] }
+    default: return { apply: 'blue', params: [randomInt(10, 50)] }
+  }}
+
+  if(Math.random() < 0.9) {
+    const transforms = [...Array(randomInt(1, 3))].map(getTransform);
+    (dest as any).color(transforms)
+  }
+  ////////////////////
+
+
   filenameIndex += 1
   const filename = path.join(outDir, `catbot_${filenameIndex}.png`)
 
-  return new Promise<string>((res, rej) => {
+  return new Promise<CatInfo>((res, rej) => {
     dest.write(filename, e => {
       if(e) {
         rej(e)
       }
       else {
-        res(filename)
+        res({ filename, catsMade, params })
       }
     })
   })

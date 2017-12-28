@@ -2,7 +2,9 @@ require('source-map-support').install() // tslint:disable-line:no-require-import
 
 import { makeCat } from './catmaker'
 import { twoot, Configs as TwootConfigs } from 'twoot'
-import { randomInArray } from './util'
+import { makeStatus } from './text'
+
+import { randomInArray, randomInt } from './util'
 
 import {
   MASTODON_SERVER,
@@ -34,23 +36,20 @@ if(isValidTwitterConfiguration) {
   })
 }
 
-const adjectives = [
-  `mysterious`,
-  `curious`,
-  `astonishing`,
-  `astonished`
-]
-
-const nouns = [
-  `cat`,
-  `feline`
-]
-
 async function doTwoot(): Promise<void> {
-  const cat = await makeCat()
-  const status = `${randomInArray(adjectives)} ${randomInArray(nouns)}`
+  const { filename, catsMade } = await makeCat({
+    catChance: randomInt(30, 100),
+    leftChance: randomInt(100),
+    rightChance: randomInt(100),
+    straightChance: randomInt(100),
+    minSteps: randomInArray([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 50]),
+    maxSteps: randomInArray([1, 2, 30, 35, 40, 45, 50, 55, 60, 100, 500])
+  })
+
+  const status = makeStatus(catsMade)
+
   try {
-    const urls = await twoot(twootConfigs, status, [cat])
+    const urls = await twoot(twootConfigs, status, [filename])
     console.log(`twooted:\n${urls.map(u => '\t -> ' + u).join('\n')}`)
   }
   catch(e) {
