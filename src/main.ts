@@ -1,6 +1,6 @@
 require('source-map-support').install() // tslint:disable-line:no-require-imports
 
-import { makeHeathcliff } from './heath'
+import { makeCat } from './catmaker'
 import { twoot, Configs as TwootConfigs } from 'twoot'
 import { randomInArray } from './util'
 
@@ -34,21 +34,24 @@ if(isValidTwitterConfiguration) {
   })
 }
 
-const messages = [
-  `Today's Heathcliff:`,
-  `Heathcliff comic for today:`,
-  `It's Heathcliff!`,
-  `Here's Heathcliff!`
+const adjectives = [
+  `mysterious`,
+  `curious`,
+  `astonishing`,
+  `astonished`
+]
+
+const nouns = [
+  `cat`,
+  `feline`
 ]
 
 async function doTwoot(): Promise<void> {
-  const cliff = await makeHeathcliff()
-  const status = randomInArray(messages)
+  const cat = await makeCat()
+  const status = `${randomInArray(adjectives)} ${randomInArray(nouns)}`
   try {
-    const urls = await twoot(twootConfigs, status, [cliff])
-    for(const url of urls) {
-      console.log(`twooted at '${url}'!`)
-    }
+    const urls = await twoot(twootConfigs, status, [cat])
+    console.log(`twooted:\n${urls.map(u => '\t -> ' + u).join('\n')}`)
   }
   catch(e) {
     console.error('error while trying to twoot: ', e)
@@ -59,4 +62,4 @@ doTwoot().then(() => { console.log('Made initial twoots.') })
 
 setInterval(doTwoot, 1000 * 60 * INTERVAL_MINUTES)
 
-console.log('Heathbot is running.')
+console.log('Catbot is running.')

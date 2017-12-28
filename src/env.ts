@@ -4,7 +4,7 @@ import * as envalid from 'envalid'
 const env = envalid.cleanEnv(
   process.env,
   {
-    DATA_DIR: envalid.str({ default: 'persist' }),
+    DATA_DIR: envalid.str({ default: 'parts' }),
     MASTODON_SERVER: envalid.url({ default: 'https://mastodon.social' }),
     MASTODON_TOKEN: envalid.str({ default: '' }),
     TWITTER_CONSUMER_KEY: envalid.str({ default: '' }),
@@ -30,6 +30,7 @@ export const {
 if(!fs.existsSync(DATA_DIR)) {
   throw new Error(`Data directory '${DATA_DIR}' doesn't exist!`)
 }
+
 
 export const isValidMastodonConfiguration = MASTODON_TOKEN.length > 0
 export const isValidTwitterConfiguration = (

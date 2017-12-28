@@ -1,5 +1,5 @@
 {
-  "name": "heathbot",
+  "name": "catbot",
   "version": "0.0.1",
   "description": "a bot that posts on both twitter and mastodon.",
   "private": true,
