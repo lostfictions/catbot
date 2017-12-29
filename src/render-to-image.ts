@@ -165,6 +165,10 @@ export async function renderToImage(
   //   .join('');
   // (dest as any).color([{ apply: 'mix', params: [finalTint, 20] }])
 
+  // make one pixel 99% opacity to prevent twitter jpeg compression
+  const pixCol = (Jimp as any).intToRGBA(dest.getPixelColor(0, 0))
+  dest.setPixelColor(Jimp.rgbaToInt(pixCol.r, pixCol.g, pixCol.b, pixCol.a - 1), 0, 0)
+
   filenameIndex += 1
   const filename = path.join(outDir, `catbot_${filenameIndex}.png`)
 
