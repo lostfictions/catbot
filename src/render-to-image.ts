@@ -100,7 +100,7 @@ export async function renderToImage(
   const width = sW * gridSizeX
   const height = sH * gridSizeY
   // hack: bad typings
-  const dest: Jimp = new (Jimp as any)(width, height)
+  let dest: Jimp = new (Jimp as any)(width, height)
 
   for(let x = 0; x < gridSizeX; x++) {
     for(let y = 0; y < gridSizeY; y++) {
@@ -145,6 +145,25 @@ export async function renderToImage(
   }
   ////////////////////
 
+
+  const bgCol = Jimp.rgbaToInt(randomInt(256), randomInt(256), randomInt(256), 255)
+  const bg: Jimp = new (Jimp as any)(dest.bitmap.width, dest.bitmap.height, bgCol)
+
+  const silhouette = dest.clone()
+  const silhouetteCol = '#' + [randomInt(256), randomInt(256), randomInt(256)]
+    .map(i => i.toString(16))
+    .join('');
+  (silhouette as any).color([{ apply: 'mix', params: [silhouetteCol, 100] }])
+
+  bg.composite(silhouette, 2, 2)
+  bg.composite(dest, 0, 0)
+  dest = bg
+
+  // applying a final tint pushes the colors closer together and makes them cohere a bit more
+  // const finalTint = '#' + [randomInt(256), randomInt(256), randomInt(256)]
+  //   .map(i => i.toString(16))
+  //   .join('');
+  // (dest as any).color([{ apply: 'mix', params: [finalTint, 20] }])
 
   filenameIndex += 1
   const filename = path.join(outDir, `catbot_${filenameIndex}.png`)
