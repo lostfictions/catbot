@@ -51,7 +51,6 @@ export function makeStatus(catsMade: number): string {
       case 5: return 'five'
       case 6: return 'six'
       case 7: return 'seven'
-      case 8: return 'eight'
       default: return `a ${randomInArray(veneryTerms)} of`
     }
   })(catsMade)

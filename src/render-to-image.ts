@@ -128,6 +128,23 @@ export async function renderToImage(
     dest.rotate(180)
   }
 
+
+  const bgCol = Jimp.rgbaToInt(randomInt(256), randomInt(256), randomInt(256), 255)
+  const bg: Jimp = new (Jimp as any)(dest.bitmap.width, dest.bitmap.height, bgCol)
+
+  const silhouette = dest.clone()
+  const silhouetteCol = '#' + [randomInt(50), randomInt(50), randomInt(50)]
+    .map(i => i.toString(16))
+    .map(c => c.length < 2 ? '0' + c : c)
+    .join('');
+
+  (silhouette as any).color([{ apply: 'mix', params: [silhouetteCol, 100] }])
+
+  bg.composite(silhouette, 2, 2)
+  bg.composite(dest, 0, 0)
+  dest = bg
+
+
   const getTransform = () => { const val = Math.random(); switch(true) {
     case val < 0.3: return { apply: 'spin', params: [randomInt(360)] }
     case val < 0.4: return { apply: 'lighten', params: [randomInt(5, 20)] }
@@ -145,25 +162,6 @@ export async function renderToImage(
   }
   ////////////////////
 
-
-  const bgCol = Jimp.rgbaToInt(randomInt(256), randomInt(256), randomInt(256), 255)
-  const bg: Jimp = new (Jimp as any)(dest.bitmap.width, dest.bitmap.height, bgCol)
-
-  const silhouette = dest.clone()
-  const silhouetteCol = '#' + [randomInt(256), randomInt(256), randomInt(256)]
-    .map(i => i.toString(16))
-    .join('');
-  (silhouette as any).color([{ apply: 'mix', params: [silhouetteCol, 100] }])
-
-  bg.composite(silhouette, 2, 2)
-  bg.composite(dest, 0, 0)
-  dest = bg
-
-  // applying a final tint pushes the colors closer together and makes them cohere a bit more
-  // const finalTint = '#' + [randomInt(256), randomInt(256), randomInt(256)]
-  //   .map(i => i.toString(16))
-  //   .join('');
-  // (dest as any).color([{ apply: 'mix', params: [finalTint, 20] }])
 
   // make one pixel 99% opacity to prevent twitter jpeg compression
   const pixCol = (Jimp as any).intToRGBA(dest.getPixelColor(0, 0))
