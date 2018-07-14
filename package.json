@@ -7,9 +7,9 @@
   "scripts": {
     "start": "node dist/main.js",
     "build": "rm -rf dist/ && tsc",
-    "test": "tsc --noEmit && tslint --project .",
+    "test": "tsc --noEmit && eslint 'src/**'",
     "watch": "tsc -w",
-    "dev": "ts-node-dev --transpileOnly --notify=false src/main.ts"
+    "dev": "ts-node-dev --respawn --transpileOnly --notify=false src/main.ts -- local"
   },
   "author": "s <https://github.com/lostfictions>",
   "license": "AGPL-3.0",
