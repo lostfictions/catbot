@@ -5,17 +5,11 @@
     "outDir": "dist",
     "allowJs": true,
     "strict": true,
-    "lib":[
-      "dom",
-      "es2017"
-    ],
+    "lib": ["dom", "es2017"],
     "sourceMap": true,
     "rootDirs": ["./src"],
     "noUnusedLocals": true,
     "noUnusedParameters": true
-    // "allowSyntheticDefaultImports": true,
-	},
-  "include": [
-    "./src/**/*"
-  ]
+  },
+  "include": ["./src/**/*"]
 }

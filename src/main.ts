@@ -1,11 +1,11 @@
 require("source-map-support").install();
 
-import { makeCat } from "./catmaker";
+import { scheduleJob } from "node-schedule";
 import { twoot, Configs as TwootConfigs } from "twoot";
+
+import { makeCat } from "./catmaker";
 import { makeStatus } from "./text";
-
 import { randomInt, randomByWeight } from "./util";
-
 import {
   MASTODON_SERVER,
   MASTODON_TOKEN,
@@ -15,7 +15,7 @@ import {
   TWITTER_ACCESS_KEY as accessKey,
   TWITTER_ACCESS_SECRET as accessSecret,
   isValidTwitterConfiguration,
-  INTERVAL_MINUTES
+  CRON_RULE
 } from "./env";
 
 const twootConfigs: TwootConfigs = [];
@@ -78,7 +78,7 @@ async function doTwoot(): Promise<void> {
   try {
     const urls = await twoot(twootConfigs, status, [filename]);
     console.log(
-      `[${new Date().toISOString()}] twooted:\n${urls
+      `[${new Date().toUTCString()}] twooted:\n${urls
         .map(u => "\t -> " + u)
         .join("\n")}`
     );
@@ -87,20 +87,19 @@ async function doTwoot(): Promise<void> {
   }
 }
 
+let job;
 if (process.argv.slice(2).includes("local")) {
-  // setInterval(() => {
-  //   const count = randomInt(1, 10);
-  //   console.log(`${count} => ${makeStatus(count)}`);
-  // }, 1000);
-  makeTwoot().then(({ status, filename }) =>
-    console.log(status, `file://${filename}`)
-  );
+  const localJob = () => {
+    makeTwoot().then(({ status, filename }) =>
+      console.log(status, `file://${filename}`)
+    );
+  };
+  localJob();
+  job = scheduleJob("*/20 * * * * *", localJob);
 } else {
-  doTwoot().then(() => {
-    console.log("Made initial twoots.");
-  });
-
-  setInterval(doTwoot, 1000 * 60 * INTERVAL_MINUTES);
-
-  console.log("Catbot is running.");
+  job = scheduleJob(CRON_RULE, doTwoot);
 }
+
+const now = new Date(Date.now()).toUTCString();
+const next = (job.nextInvocation() as any).toDate().toUTCString();
+console.log(`[${now}] Bot is running! Next job scheduled for [${next}]`);

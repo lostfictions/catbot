@@ -150,7 +150,7 @@ function addCat(
         }
         // if it's a straight segment, check the same conditions for the next
         // space in that direction.
-      } while (true);
+      } while (true); // eslint-disable-line no-constant-condition
       if (shouldDelete) {
         delete (validTurns as any)[nextDir];
       }

@@ -1,4 +1,4 @@
-FROM node:9.2
+FROM node:10.6
 
 MAINTAINER s
 
@@ -11,8 +11,8 @@ MAINTAINER s
 WORKDIR /code
 COPY . /code
 
-RUN npm i
-RUN npm run build
+RUN yarn
+RUN yarn build
 
 ENV DEBUG=*
-ENTRYPOINT npm run start
+ENTRYPOINT yarn start

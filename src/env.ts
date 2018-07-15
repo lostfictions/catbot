@@ -11,7 +11,7 @@ const env = envalid.cleanEnv(
     TWITTER_CONSUMER_SECRET: envalid.str({ default: "" }),
     TWITTER_ACCESS_KEY: envalid.str({ default: "" }),
     TWITTER_ACCESS_SECRET: envalid.str({ default: "" }),
-    INTERVAL_MINUTES: envalid.num({ default: 60 * 4 })
+    CRON_RULE: envalid.str({ default: "0 0,4,8,12,16,20 * * *" })
   },
   { strict: true }
 );
@@ -24,7 +24,7 @@ export const {
   TWITTER_CONSUMER_SECRET,
   TWITTER_ACCESS_KEY,
   TWITTER_ACCESS_SECRET,
-  INTERVAL_MINUTES
+  CRON_RULE
 } = env;
 
 if (!fs.existsSync(DATA_DIR)) {
