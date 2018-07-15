@@ -80,6 +80,10 @@ async function doTwoot(): Promise<void> {
 }
 
 if (process.argv.slice(2).includes("local")) {
+  // setInterval(() => {
+  //   const count = randomInt(1, 10);
+  //   console.log(`${count} => ${makeStatus(count)}`);
+  // }, 1000);
   makeTwoot().then(({ status, filename }) =>
     console.log(status, `file://${filename}`)
   );

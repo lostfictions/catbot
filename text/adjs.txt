@@ -835,7 +835,6 @@ traditional
 transformed
 trapped
 traveled
-traverse
 trusting
 trying
 twisted

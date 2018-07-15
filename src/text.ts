@@ -17,8 +17,6 @@ const names = processFile("../text/names.txt");
 const veneryTerms = processFile("../text/venery-terms.txt");
 const wordsForCat = processFile("../text/words-for-cat.txt");
 
-const joiners = [", ", " but ", " and "];
-
 function an(word: string) {
   switch (true) {
     case word[0].toLowerCase() === "u" &&
@@ -38,12 +36,17 @@ function randomBagPreferred(
   count: number = 1
 ): string[] {
   const results = [
-    ...randomBag(arr.filter(a => a.startsWith(preferred[0])), count)
+    ...randomBag(
+      arr.filter(a => a.toLowerCase().startsWith(preferred[0].toLowerCase())),
+      count
+    )
   ];
   if (results.length < count) {
     results.push(
       ...randomBag(
-        arr.filter(a => !a.startsWith(preferred[0])),
+        arr.filter(
+          a => !a.toLowerCase().startsWith(preferred[0].toLowerCase())
+        ),
         count - results.length
       )
     );
@@ -78,7 +81,7 @@ export function makeStatus(catsMade: number): string {
     : randomBag(adjs, adjCount);
 
   const adj = chosenAdjs.join(
-    adjCount === 2 && Math.random() < 0.5 ? randomInArray(joiners) : ", "
+    adjCount === 2 && Math.random() < 0.5 ? " and " : ", "
   );
 
   const prefix = ((count: number) => {
@@ -102,13 +105,31 @@ export function makeStatus(catsMade: number): string {
     }
   })(catsMade);
 
-  const maybeNames =
-    catsMade >= 2 && catsMade <= 5 && Math.random() < 0.18
-      ? ` (${(alliterate
-          ? randomBagPreferred(names, catword, catsMade)
-          : randomBag(names, catsMade)
-        ).join(catsMade === 2 ? " and " : ", ")})`
-      : "";
+  let chosenNames = "";
+  if (catsMade <= 5 && Math.random() < 0.18) {
+    chosenNames = (alliterate
+      ? randomBagPreferred(names, catword, catsMade)
+      : randomBag(names, catsMade)
+    ).join(catsMade === 2 ? " and " : ", ");
 
-  return `${prefix} ${adj} ${catword}${maybeNames}:`;
+    if (catsMade === 1) {
+      if (Math.random() < 0.3) {
+        chosenNames = ` named ${chosenNames}`;
+      } else if (Math.random() < 0.6) {
+        chosenNames = `: ${chosenNames}`;
+      } else {
+        chosenNames = ` (${chosenNames})`;
+      }
+    } else {
+      if (Math.random() < 0.3) {
+        chosenNames = ` (${chosenNames})`;
+      } else if (Math.random() < 0.6) {
+        chosenNames = `: ${chosenNames}`;
+      } else {
+        chosenNames = ` (named ${chosenNames})`;
+      }
+    }
+  }
+
+  return `${prefix} ${adj} ${catword}${chosenNames}`;
 }
