@@ -35,6 +35,12 @@ if (isValidTwitterConfiguration) {
 }
 
 async function makeTwoot(): Promise<{ status: string; filename: string }> {
+  const sizeChance = Math.random();
+  const sizeMultiplier = sizeChance < 0.02 ? 3 : sizeChance < 0.06 ? 2 : 1;
+
+  const tallChance = Math.random();
+  const tallMultiplier = tallChance < 0.02 ? 3 : tallChance < 0.06 ? 2 : 1;
+
   const { filename, catsMade } = await makeCat({
     catChance: randomByWeight([[80, 10], [90, 5], [100, 10]]),
     leftChance: randomByWeight([
@@ -56,7 +62,9 @@ async function makeTwoot(): Promise<{ status: string; filename: string }> {
       [randomInt(50, 100), 10]
     ]),
     minSteps: randomByWeight([[1, 1], [randomInt(5, 15), 20], [50, 1]]),
-    maxSteps: randomByWeight([[1, 1], [randomInt(30, 60), 20], [100, 1]])
+    maxSteps: randomByWeight([[1, 1], [randomInt(30, 60), 20], [100, 1]]),
+    gridSizeX: 16 * sizeMultiplier,
+    gridSizeY: 9 * sizeMultiplier * tallMultiplier
   });
 
   const status = makeStatus(catsMade);
