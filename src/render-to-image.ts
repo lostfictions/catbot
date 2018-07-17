@@ -148,7 +148,7 @@ export async function renderToImage(
 
   (silhouette as any).color([{ apply: "mix", params: [silhouetteCol, 100] }]);
 
-  bg.composite(silhouette, 2, 2);
+  bg.composite(silhouette, randomInt(-3, 4), randomInt(-3, 4));
   bg.composite(dest, 0, 0);
   dest = bg;
 

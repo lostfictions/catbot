@@ -36,10 +36,13 @@ if (isValidTwitterConfiguration) {
 
 async function makeTwoot(): Promise<{ status: string; filename: string }> {
   const sizeChance = Math.random();
-  const sizeMultiplier = sizeChance < 0.02 ? 3 : sizeChance < 0.06 ? 2 : 1;
+  const sizeMultiplier = sizeChance < 0.008 ? 3 : sizeChance < 0.02 ? 2 : 1;
+
+  const wideChance = Math.random();
+  const wideMultiplier = wideChance < 0.015 ? 3 : wideChance < 0.045 ? 2 : 1;
 
   const tallChance = Math.random();
-  const tallMultiplier = tallChance < 0.02 ? 3 : tallChance < 0.06 ? 2 : 1;
+  const tallMultiplier = tallChance < 0.015 ? 3 : tallChance < 0.045 ? 2 : 1;
 
   const { filename, catsMade } = await makeCat({
     catChance: randomByWeight([[80, 10], [90, 5], [100, 10]]),
@@ -63,7 +66,7 @@ async function makeTwoot(): Promise<{ status: string; filename: string }> {
     ]),
     minSteps: randomByWeight([[1, 1], [randomInt(5, 15), 20], [50, 1]]),
     maxSteps: randomByWeight([[1, 1], [randomInt(30, 60), 20], [100, 1]]),
-    gridSizeX: 16 * sizeMultiplier,
+    gridSizeX: 16 * sizeMultiplier * wideMultiplier,
     gridSizeY: 9 * sizeMultiplier * tallMultiplier
   });
 
@@ -97,6 +100,7 @@ if (process.argv.slice(2).includes("local")) {
   localJob();
   job = scheduleJob("*/20 * * * * *", localJob);
 } else {
+  // we're running in production mode!
   job = scheduleJob(CRON_RULE, doTwoot);
 }
 
