@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import { tmpdir } from "os";
 
 import * as Jimp from "jimp";
 
@@ -25,14 +24,19 @@ const filenameToPart: { [pattern: string]: CatParts } = {
   "head-d": CatParts.EndD
 };
 
-const outDir = tmpdir();
+let cachedSprites: {
+  parts: { [part: string]: Jimp[] };
+  spriteSize: [number, number];
+};
 
-let catSprites: { [part: string]: Jimp[] };
-let spriteSize: [number, number];
+async function loadSprites(): Promise<{
+  parts: { [part: string]: Jimp[] };
+  spriteSize: [number, number];
+}> {
+  if (!cachedSprites) {
+    const parts: { [part: string]: Jimp[] } = {};
+    let spriteSize: [number, number] | null = null;
 
-async function loadSprites(): Promise<{ [part: string]: Jimp[] }> {
-  if (!catSprites) {
-    catSprites = {};
     const prefixes = Object.keys(filenameToPart);
 
     const filenames = fs.readdirSync(DATA_DIR);
@@ -61,42 +65,41 @@ async function loadSprites(): Promise<{ [part: string]: Jimp[] }> {
           );
         }
 
-        let arr: Jimp[] | undefined = catSprites[filenameToPart[prefix]];
+        let arr: Jimp[] | undefined = parts[filenameToPart[prefix]];
         if (!Array.isArray(arr)) {
           arr = [];
-          catSprites[filenameToPart[prefix]] = arr;
+          parts[filenameToPart[prefix]] = arr;
         }
         arr.push(sprite);
       }
     }
     // ensure there's at least one sprite for each part
     for (const part of Object.values(filenameToPart)) {
-      if (!Array.isArray((catSprites as any)[part])) {
+      if (!Array.isArray(parts[part])) {
         throw new Error(`Missing sprite category: ${part}`);
       }
     }
+
+    cachedSprites = {
+      parts,
+      spriteSize
+    } as any;
   }
-  return catSprites;
-}
 
-let filenameIndex = 0;
-
-export interface CatInfo {
-  filename: string;
-  catsMade: number;
-  params: CatConfig;
+  return cachedSprites;
 }
 
 export async function renderToImage(
   grid: CatParts[][],
-  params: CatConfig,
-  catsMade: number
-): Promise<CatInfo> {
-  const parts = await loadSprites();
+  params: CatConfig
+): Promise<Jimp> {
+  const {
+    parts,
+    spriteSize: [sW, sH]
+  } = await loadSprites();
 
   const { gridSizeX, gridSizeY } = params;
 
-  const [sW, sH] = spriteSize;
   const width = sW * gridSizeX;
   const height = sH * gridSizeY;
   // hack: bad typings
@@ -188,16 +191,5 @@ export async function renderToImage(
     0
   );
 
-  filenameIndex += 1;
-  const filename = path.join(outDir, `catbot_${filenameIndex}.png`);
-
-  return new Promise<CatInfo>((res, rej) => {
-    dest.write(filename, e => {
-      if (e) {
-        rej(e);
-      } else {
-        res({ filename, catsMade, params });
-      }
-    });
-  });
+  return dest;
 }

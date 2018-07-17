@@ -3,8 +3,13 @@ require("source-map-support").install();
 import { scheduleJob } from "node-schedule";
 import { twoot, Configs as TwootConfigs } from "twoot";
 
+import * as Jimp from "jimp";
+
 import { makeCat } from "./catmaker";
+import { renderToImage } from "./render-to-image";
+import { writeToFile } from "./write-image-to-file";
 import { makeStatus } from "./text";
+
 import { randomInt, randomByWeight } from "./util";
 import {
   MASTODON_SERVER,
@@ -34,7 +39,7 @@ if (isValidTwitterConfiguration) {
   });
 }
 
-async function makeTwoot(): Promise<{ status: string; filename: string }> {
+async function makeTwoot(): Promise<{ status: string; image: Jimp }> {
   const sizeChance = Math.random();
   const sizeMultiplier = sizeChance < 0.008 ? 3 : sizeChance < 0.02 ? 2 : 1;
 
@@ -44,7 +49,7 @@ async function makeTwoot(): Promise<{ status: string; filename: string }> {
   const tallChance = Math.random();
   const tallMultiplier = tallChance < 0.015 ? 3 : tallChance < 0.045 ? 2 : 1;
 
-  const { filename, catsMade } = await makeCat({
+  const gen = makeCat({
     catChance: randomByWeight([[80, 10], [90, 5], [100, 10]]),
     leftChance: randomByWeight([
       [0, 1],
@@ -70,13 +75,19 @@ async function makeTwoot(): Promise<{ status: string; filename: string }> {
     gridSizeY: 9 * sizeMultiplier * tallMultiplier
   });
 
+  const steps = [...gen];
+  const { grid, catsMade, config } = steps[steps.length - 1];
+
+  const image = await renderToImage(grid, config);
+
   const status = makeStatus(catsMade);
 
-  return { status, filename };
+  return { status, image };
 }
 
 async function doTwoot(): Promise<void> {
-  const { status, filename } = await makeTwoot();
+  const { status, image } = await makeTwoot();
+  const filename = await writeToFile(image);
 
   try {
     const urls = await twoot(twootConfigs, status, [filename]);
@@ -92,18 +103,22 @@ async function doTwoot(): Promise<void> {
 
 let job;
 if (process.argv.slice(2).includes("local")) {
+  // seems like scheduleJob doesn't like being passed async functions
+  // directly...?
   const localJob = () => {
-    makeTwoot().then(({ status, filename }) =>
-      console.log(status, `file://${filename}`)
-    );
+    (async () => {
+      const { status, image } = await makeTwoot();
+      const filename = await writeToFile(image);
+      console.log(status, `file://${filename}`);
+    })();
   };
   localJob();
-  job = scheduleJob("*/20 * * * * *", localJob);
+  job = scheduleJob("*/10 * * * * *", localJob);
 } else {
   // we're running in production mode!
   job = scheduleJob(CRON_RULE, doTwoot);
 }
 
 const now = new Date(Date.now()).toUTCString();
-const next = (job.nextInvocation() as any).toDate().toUTCString();
+const next = (job.nextInvocation() as any).toDate().toUTCString(); // bad typings
 console.log(`[${now}] Bot is running! Next job scheduled for [${next}]`);

@@ -1,8 +1,6 @@
 import { randomByWeight, randomInt } from "./util";
 import { CatParts, CatConfig } from "./cat-config";
 
-import { renderToImage, CatInfo } from "./render-to-image";
-
 // Lookup table mapping from directions [right, up, left, down]
 // to parts to use and position delta to apply.
 interface CatDirection {
@@ -225,7 +223,13 @@ function addCat(
 
 export type CatOptions = Partial<CatConfig>;
 
-export async function makeCat(config: CatOptions = {}): Promise<CatInfo> {
+export function* makeCat(
+  config: CatOptions = {}
+): IterableIterator<{
+  grid: CatParts[][];
+  catsMade: number;
+  config: CatConfig;
+}> {
   const defaultConfig: CatConfig = {
     catChance: 50,
     leftChance: 50,
@@ -253,14 +257,18 @@ export async function makeCat(config: CatOptions = {}): Promise<CatInfo> {
   }
 
   let lastAddSucceeded = addCat(grid, turnChance, finalConfig);
-  let catCount = 1;
+  let catsMade = 1;
 
   while (Math.random() < finalConfig.catChance / 100 && lastAddSucceeded) {
     lastAddSucceeded = addCat(grid, turnChance, finalConfig);
     if (lastAddSucceeded) {
-      catCount++;
+      catsMade++;
     }
   }
 
-  return renderToImage(grid, finalConfig, catCount);
+  yield {
+    grid,
+    catsMade,
+    config: finalConfig
+  };
 }
