@@ -74,7 +74,7 @@ export function makeStatus(catsMade: number): string {
     adjCount = 1;
   }
 
-  const alliterate = Math.random() > 0.1;
+  const alliterate = Math.random() < 0.9;
 
   const chosenAdjs = alliterate
     ? randomBagPreferred(adjs, catword, adjCount)

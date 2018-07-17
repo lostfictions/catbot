@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as path from "path";
+import { join, parse as parsePath } from "path";
 
 import * as Jimp from "jimp";
 
@@ -26,32 +26,32 @@ const filenameToPart: { [pattern: string]: CatParts } = {
 
 let cachedSprites: {
   parts: { [part: string]: Jimp[] };
+  overlays: { [part: string]: { [featureType: string]: Jimp[] } };
   spriteSize: [number, number];
 };
 
-async function loadSprites(): Promise<{
-  parts: { [part: string]: Jimp[] };
-  spriteSize: [number, number];
-}> {
+async function loadSprites(): Promise<typeof cachedSprites> {
   if (!cachedSprites) {
     const parts: { [part: string]: Jimp[] } = {};
+    const overlays: { [part: string]: { [featureType: string]: Jimp[] } } = {};
     let spriteSize: [number, number] | null = null;
 
     const prefixes = Object.keys(filenameToPart);
 
-    const filenames = fs.readdirSync(DATA_DIR);
-    if (filenames.length === 0) {
-      throw new Error(`No files in image directory '${DATA_DIR}'`);
+    const partsDirname = join(DATA_DIR, "parts");
+    const partsFilenames = fs.readdirSync(partsDirname);
+    if (partsFilenames.length === 0) {
+      throw new Error(`No files in image directory '${partsDirname}'`);
     }
 
-    for (const fn of filenames) {
+    for (const fn of partsFilenames) {
       const prefix = prefixes.find(p => fn.startsWith(p));
       if (!prefix) {
         console.warn(
           `Filename pattern doesn't match any known part prefix: '${fn}'`
         );
       } else {
-        const sprite = await Jimp.read(path.join(DATA_DIR, fn));
+        const sprite = await Jimp.read(join(partsDirname, fn));
 
         const { width, height } = sprite.bitmap;
         // infer our sprite size from the first file we load
@@ -65,7 +65,7 @@ async function loadSprites(): Promise<{
           );
         }
 
-        let arr: Jimp[] | undefined = parts[filenameToPart[prefix]];
+        let arr = parts[filenameToPart[prefix]];
         if (!Array.isArray(arr)) {
           arr = [];
           parts[filenameToPart[prefix]] = arr;
@@ -73,6 +73,58 @@ async function loadSprites(): Promise<{
         arr.push(sprite);
       }
     }
+
+    const overlaysDirname = join(DATA_DIR, "overlays");
+    if (fs.existsSync(overlaysDirname)) {
+      const overlayFilenames = fs.readdirSync(overlaysDirname);
+      for (const fn of overlayFilenames) {
+        const [prefix, featureName] = parsePath(fn).name.split("-");
+
+        // this is not great, but maybe good enough for now
+        if (prefix !== "head") {
+          console.warn(`currently unhandled overlay part: ${prefix}`);
+        } else {
+          const sprite = await Jimp.read(join(overlaysDirname, fn));
+
+          const { width, height } = sprite.bitmap;
+          if (width !== spriteSize![0] || height !== spriteSize![1]) {
+            throw new Error(
+              `Inconsistent sprite size:\n` +
+                `Expected '${fn}' to be [${spriteSize!.join(", ")}],\n` +
+                `instead got [${width}, ${height}]`
+            );
+          }
+
+          const rotationMap = {
+            "head-u": 0,
+            "head-r": 90,
+            "head-d": 180,
+            "head-l": 270
+          };
+
+          Object.entries(rotationMap).forEach(([partName, rotation]) => {
+            let featureMap = overlays[filenameToPart[partName]];
+            if (!featureMap) {
+              featureMap = {};
+              overlays[filenameToPart[partName]] = featureMap;
+            }
+
+            let arr = featureMap[featureName];
+            if (!Array.isArray(arr)) {
+              arr = [];
+              featureMap[featureName] = arr;
+            }
+
+            const rotated = sprite.clone();
+            rotated.rotate(rotation);
+            arr.push(rotated);
+          });
+        }
+      }
+    } else {
+      console.warn(`Overlays dirname not found: "${overlaysDirname}"`);
+    }
+
     // ensure there's at least one sprite for each part
     for (const part of Object.values(filenameToPart)) {
       if (!Array.isArray(parts[part])) {
@@ -82,8 +134,9 @@ async function loadSprites(): Promise<{
 
     cachedSprites = {
       parts,
-      spriteSize
-    } as any;
+      overlays,
+      spriteSize: spriteSize!
+    };
   }
 
   return cachedSprites;
@@ -95,6 +148,7 @@ export async function renderToImage(
 ): Promise<Jimp> {
   const {
     parts,
+    overlays,
     spriteSize: [sW, sH]
   } = await loadSprites();
 
@@ -111,6 +165,13 @@ export async function renderToImage(
       const partType = grid[x][gridSizeY - y - 1];
       const sprite = randomInArray(parts[partType]);
       dest.blit(sprite, sW * x, sH * y);
+      // just default to one of each feature type for now
+      if (overlays[partType]) {
+        Object.values(overlays[partType]).forEach(feature => {
+          const featureSprite = randomInArray(feature);
+          dest.composite(featureSprite, sW * x, sH * y);
+        });
+      }
     }
   }
 
