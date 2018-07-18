@@ -3,7 +3,7 @@ import { join, parse as parsePath } from "path";
 
 import * as Jimp from "jimp";
 
-import { randomInArray, randomInt } from "./util";
+import { randomInArray, randomInt, randomFloat, hsvToRGB } from "./util";
 import { DATA_DIR } from "./env";
 
 import { CatParts, CatConfig } from "./cat-config";
@@ -28,6 +28,8 @@ let cachedSprites: {
   parts: { [part: string]: Jimp[] };
   overlays: { [part: string]: { [featureType: string]: Jimp[] } };
   spriteSize: [number, number];
+  /** Normal color, light shade, dark shade */
+  palette: [number, number, number];
 };
 
 async function loadSprites(): Promise<typeof cachedSprites> {
@@ -132,10 +134,16 @@ async function loadSprites(): Promise<typeof cachedSprites> {
       }
     }
 
+    const palette = await Jimp.read(join(DATA_DIR, "palette.png"));
+    const normal = palette.getPixelColor(1, 0);
+    const lightShade = palette.getPixelColor(2, 0);
+    const darkShade = palette.getPixelColor(3, 0);
+
     cachedSprites = {
       parts,
       overlays,
-      spriteSize: spriteSize!
+      spriteSize: spriteSize!,
+      palette: [normal, lightShade, darkShade]
     };
   }
 
@@ -149,7 +157,8 @@ export async function renderToImage(
   const {
     parts,
     overlays,
-    spriteSize: [sW, sH]
+    spriteSize: [sW, sH],
+    palette
   } = await loadSprites();
 
   const { gridSizeX, gridSizeY } = params;
@@ -190,29 +199,75 @@ export async function renderToImage(
     dest.rotate(180);
   }
 
-  const bgCol = Jimp.rgbaToInt(
-    randomInt(256),
-    randomInt(256),
-    randomInt(256),
-    255
-  );
+  // Recolor cat
+  const baseColor = [randomInt(360), randomInt(30, 50), randomInt(60, 80)];
+  const lightShade = [...baseColor];
+  if (Math.random() < 0.5) {
+    lightShade[0] = (lightShade[0] + randomInt(-40, 40)) % 360;
+  }
+  lightShade[1] *= randomFloat(0.7, 0.9);
+  lightShade[2] *= randomFloat(0.6, 0.9);
+  const darkShade = [...lightShade];
+  darkShade[1] *= randomFloat(0.7, 0.9);
+  darkShade[2] *= randomFloat(0.4, 0.7);
+
+  let didMakeTransparent = false;
+
+  // Recolor the cat based on palette
+  if (Math.random() < 0.85) {
+    didMakeTransparent = Math.random() < 0.1;
+
+    const replacement = [baseColor, lightShade, darkShade].map(c => {
+      const [r, g, b] = hsvToRGB(c as [number, number, number]);
+      const a = didMakeTransparent
+        ? Math.random() < 0.3
+          ? 0
+          : randomInt(20, 220)
+        : 255;
+      return Jimp.rgbaToInt(r, g, b, a);
+    });
+
+    // selectively recolour image
+    dest.scan(0, 0, dest.bitmap.width, dest.bitmap.height, (x, y) => {
+      const paletteIndex = palette.indexOf(dest.getPixelColor(x, y));
+      if (paletteIndex !== -1) {
+        dest.setPixelColor(replacement[paletteIndex], x, y);
+      }
+    });
+  }
+
+  const [bgR, bgG, bgB] = hsvToRGB([
+    randomInt(0, 360),
+    randomInt(30, 50),
+    randomInt(60, 80)
+  ]);
+  const bgCol = Jimp.rgbaToInt(bgR, bgG, bgB, 255);
   const bg: Jimp = new (Jimp as any)(
     dest.bitmap.width,
     dest.bitmap.height,
     bgCol
   );
 
-  const silhouette = dest.clone();
-  const silhouetteCol =
-    "#" +
-    [randomInt(50), randomInt(50), randomInt(50)]
-      .map(i => i.toString(16))
-      .map(c => (c.length < 2 ? "0" + c : c))
-      .join("");
+  // don't make a silhouette if we're transparent!
+  if (!didMakeTransparent && Math.random() < 0.8) {
+    const silhouette = dest.clone();
+    const silhouetteCol =
+      "#" +
+      [randomInt(50), randomInt(50), randomInt(50)]
+        .map(i => i.toString(16))
+        .map(c => (c.length < 2 ? "0" + c : c))
+        .join("");
 
-  (silhouette as any).color([{ apply: "mix", params: [silhouetteCol, 100] }]);
+    (silhouette as any).color([
+      {
+        apply: "mix",
+        params: [silhouetteCol, 100]
+      }
+    ]);
 
-  bg.composite(silhouette, randomInt(-3, 4), randomInt(-3, 4));
+    bg.composite(silhouette, randomInt(-3, 4), randomInt(-3, 4));
+  }
+
   bg.composite(dest, 0, 0);
   dest = bg;
 

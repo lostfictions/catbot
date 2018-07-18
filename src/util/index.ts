@@ -8,6 +8,20 @@ export function escapeForRegex(expression: string): string {
   return expression.replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
+/** Returns a random number between min (inclusive) and max (inclusive). */
+export function randomFloat(max: number): number;
+export function randomFloat(min: number, max: number): number;
+export function randomFloat(min: number, max?: number): number {
+  if (typeof max === "undefined") {
+    max = min;
+    min = 0;
+  }
+  if (max < min) {
+    [min, max] = [max, min];
+  }
+  return Math.random() * (max - min) + min;
+}
+
 /** Returns a random number between min (inclusive) and max (exclusive). */
 export function randomInt(max: number): number;
 export function randomInt(min: number, max: number): number;
@@ -76,4 +90,87 @@ export function randomByWeight(
     }
   }
   throw new Error("We goofed!");
+}
+
+/**
+ * @param rgb A tuple with values in the interval [0-255].
+ * @returns A tuple with values in the interval [0-360] for hue and [0-100] for
+ * saturation and value.
+ */
+export function rgbToHSV(
+  rgb: [number, number, number]
+): [number, number, number] {
+  const r = rgb[0] / 255;
+  const g = rgb[1] / 255;
+  const b = rgb[2] / 255;
+
+  let h: number;
+  let s: number;
+  const v = Math.max(r, g, b);
+
+  const diff = v - Math.min(r, g, b);
+  const diffc = (c: number) => (v - c) / 6 / diff + 1 / 2;
+
+  if (diff === 0) {
+    h = s = 0;
+  } else {
+    s = diff / v;
+    const rdif = diffc(r);
+    const gdif = diffc(g);
+    const bdif = diffc(b);
+
+    if (r === v) {
+      h = bdif - gdif;
+    } else if (g === v) {
+      h = 1 / 3 + rdif - bdif;
+    } else {
+      h = 2 / 3 + gdif - rdif;
+    }
+
+    if (h < 0) {
+      h += 1;
+    } else if (h > 1) {
+      h -= 1;
+    }
+  }
+
+  return [h * 360, s * 100, v * 100];
+}
+
+/**
+ * @param hsv A tuple with values in the interval [0-360] for hue and [0-100] for
+ * saturation and value.
+ * @returns A tuple with values in the interval [0-255].
+ */
+export function hsvToRGB(
+  hsv: [number, number, number]
+): [number, number, number] {
+  const h = hsv[0] / 60;
+  const s = hsv[1] / 100;
+  let v = hsv[2] / 100;
+
+  const hi = Math.floor(h) % 6;
+
+  const f = h - Math.floor(h);
+  const p = 255 * v * (1 - s);
+  const q = 255 * v * (1 - s * f);
+  const t = 255 * v * (1 - s * (1 - f));
+  v *= 255;
+
+  switch (hi) {
+    case 0:
+      return [v, t, p];
+    case 1:
+      return [q, v, p];
+    case 2:
+      return [p, v, t];
+    case 3:
+      return [p, q, v];
+    case 4:
+      return [t, p, v];
+    case 5:
+      return [v, p, q];
+    default:
+      throw new Error("Invalid hue interval");
+  }
 }
