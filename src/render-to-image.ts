@@ -195,7 +195,7 @@ export async function renderToImage(
     dest.mirror(false, true);
   }
 
-  if (Math.random() < 0.2) {
+  if (Math.random() < 0.03) {
     dest.rotate(180);
   }
 
