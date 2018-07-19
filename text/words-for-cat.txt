@@ -1,13 +1,19 @@
 alley cat
+animal
+beast
+creature
 feline
 feral
 friend
+furball
 grimalkin
 hunter
 kitten
 kitty
 mouser
+pet
 puss
+stray
 tabby
 tom
 tomcat
