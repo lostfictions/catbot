@@ -1,3 +1,11 @@
+export function clamp(val: number, min: number, max: number): number {
+  return Math.min(Math.max(val, min), max);
+}
+
+export function wrap(value: number, max: number) {
+  return ((value % max) + max) % max;
+}
+
 /**
  * Escape special characters that would cause errors if we interpolated them
  * into a regex.
@@ -100,9 +108,9 @@ export function randomByWeight(
 export function rgbToHSV(
   rgb: [number, number, number]
 ): [number, number, number] {
-  const r = rgb[0] / 255;
-  const g = rgb[1] / 255;
-  const b = rgb[2] / 255;
+  const r = clamp(rgb[0] / 255, 0, 1);
+  const g = clamp(rgb[1] / 255, 0, 1);
+  const b = clamp(rgb[2] / 255, 0, 1);
 
   let h: number;
   let s: number;
@@ -145,9 +153,9 @@ export function rgbToHSV(
 export function hsvToRGB(
   hsv: [number, number, number]
 ): [number, number, number] {
-  const h = hsv[0] / 60;
-  const s = hsv[1] / 100;
-  let v = hsv[2] / 100;
+  const h = wrap(hsv[0], 360) / 60;
+  const s = clamp(hsv[1], 0, 100) / 100;
+  let v = clamp(hsv[2], 0, 100) / 100;
 
   const hi = Math.floor(h) % 6;
 
@@ -171,6 +179,6 @@ export function hsvToRGB(
     case 5:
       return [v, p, q];
     default:
-      throw new Error("Invalid hue interval");
+      throw new Error(`Invalid hue interval: ${hi}`);
   }
 }
