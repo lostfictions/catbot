@@ -7,8 +7,11 @@ WORKDIR /code
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
-COPY . ./
+COPY tsconfig.json ./
+COPY src ./src
 RUN yarn build
+
+COPY . ./
 
 ENV NODE_ENV=production
 ENV DEBUG=*
