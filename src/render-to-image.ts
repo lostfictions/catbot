@@ -199,23 +199,21 @@ export async function renderToImage(
     dest.rotate(180);
   }
 
-  // Recolor cat
-  const baseColor = [randomInt(360), randomInt(30, 50), randomInt(60, 80)];
-  const lightShade = [...baseColor];
-  if (Math.random() < 0.5) {
-    lightShade[0] = (lightShade[0] + randomInt(-40, 40)) % 360;
-  }
-  lightShade[1] *= randomFloat(0.7, 0.9);
-  lightShade[2] *= randomFloat(0.6, 0.9);
-  const darkShade = [...lightShade];
-  darkShade[1] *= randomFloat(0.7, 0.9);
-  darkShade[2] *= randomFloat(0.4, 0.7);
-
   let didMakeTransparent = false;
-
   // Recolor the cat based on palette
   if (Math.random() < 0.85) {
     didMakeTransparent = Math.random() < 0.1;
+
+    const baseColor = [randomInt(360), randomInt(30, 50), randomInt(60, 80)];
+    const lightShade = [...baseColor];
+    if (Math.random() < 0.5) {
+      lightShade[0] = (lightShade[0] + randomInt(-40, 40)) % 360;
+    }
+    lightShade[1] *= randomFloat(0.7, 0.9);
+    lightShade[2] *= randomFloat(0.6, 0.9);
+    const darkShade = [...lightShade];
+    darkShade[1] *= randomFloat(0.7, 0.9);
+    darkShade[2] *= randomFloat(0.4, 0.7);
 
     const replacement = [baseColor, lightShade, darkShade].map(c => {
       const [r, g, b] = hsvToRGB(c as [number, number, number]);
