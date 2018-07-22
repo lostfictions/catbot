@@ -1,7 +1,5 @@
 FROM node:10.6
 
-MAINTAINER s
-
 WORKDIR /code
 
 COPY package.json yarn.lock ./

@@ -201,10 +201,10 @@ export async function renderToImage(
 
   let didMakeTransparent = false;
   // Recolor the cat based on palette
-  if (Math.random() < 0.85) {
+  if (Math.random() < 0.5) {
     didMakeTransparent = Math.random() < 0.1;
 
-    const baseColor = [randomInt(360), randomInt(30, 50), randomInt(60, 80)];
+    const baseColor = [randomInt(360), randomInt(60, 90), randomInt(80, 90)];
     const lightShade = [...baseColor];
     if (Math.random() < 0.5) {
       lightShade[0] = (lightShade[0] + randomInt(-40, 40)) % 360;
@@ -234,11 +234,12 @@ export async function renderToImage(
     });
   }
 
-  const [bgR, bgG, bgB] = hsvToRGB([
+  const bgColor: [number, number, number] = [
     randomInt(0, 360),
-    randomInt(30, 50),
-    randomInt(60, 80)
-  ]);
+    randomInt(10, 50),
+    randomInt(10, 80)
+  ];
+  const [bgR, bgG, bgB] = hsvToRGB(bgColor);
   const bgCol = Jimp.rgbaToInt(bgR, bgG, bgB, 255);
   const bg: Jimp = new (Jimp as any)(
     dest.bitmap.width,
