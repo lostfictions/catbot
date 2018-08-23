@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as pluralize from "pluralize";
 
-import { randomInArray, randomBag } from "./util";
+import { randomInArray, randomBag, pluckOne } from "./util";
 
 const processFile = (filePath: string): string[] =>
   fs
@@ -30,6 +30,11 @@ function an(word: string) {
   }
 }
 
+/**
+ * Return a shuffled array of strings from `arr` of length either `count` or the
+ * length of the input array, whichever is smaller. Values from the input array
+ * that start with the same letter as `preferred` will be prioritied.
+ */
 function randomBagPreferred(
   arr: string[],
   preferred: string,
@@ -61,8 +66,15 @@ function randomBagPreferred(
   return results;
 }
 
+let catWordsBag: string[] = [];
 export function makeStatus(catsMade: number): string {
-  const catword = pluralize(randomInArray(wordsForCat), catsMade);
+  // Refill our bag if we're not _entirely_ empty, but we're close. This way
+  // we're not forced to cycle through every single name, but we'll see more
+  // variation than full-random.
+  if (catWordsBag.length < Math.ceil(wordsForCat.length * 0.15)) {
+    catWordsBag = randomBag(wordsForCat);
+  }
+  const catword = pluralize(pluckOne(catWordsBag)!, catsMade);
 
   const adjChance = Math.random();
   let adjCount;

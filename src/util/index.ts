@@ -48,7 +48,11 @@ export function randomInArray<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function randomBag<T>(arr: T[], count: number = 1): T[] {
+/**
+ * Return a new array of shuffled values from `arr` -- of length either `count`
+ * or the length of values in the original array, whichever is smaller
+ */
+export function randomBag<T>(arr: T[], count = arr.length): T[] {
   if (count === 1) return [randomInArray(arr)];
   const values = [];
   const bag = [...arr];
@@ -57,6 +61,22 @@ export function randomBag<T>(arr: T[], count: number = 1): T[] {
     count--;
   }
   return values;
+}
+
+/** Removes a random value from the given array and returns it. */
+export function pluckOne<T>(arr: T[]): T | undefined {
+  const index = Math.floor(Math.random() * arr.length);
+  return arr.splice(index, 1)[0];
+}
+
+/** Removes `count` values at random from the given array and returns them. */
+export function pluck<T>(arr: T[], count: number): T[] {
+  const pluckedValues: T[] = [];
+  while (count > 0 && arr.length > 0) {
+    const index = Math.floor(Math.random() * arr.length);
+    pluckedValues.push(...arr.splice(index, 1));
+  }
+  return pluckedValues;
 }
 
 export interface WeightedValues {
