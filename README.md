@@ -1,5 +1,9 @@
 a nice bot 4 u.
 
+![some cats](https://i.imgur.com/bWQ7Y75.png)
+
+![more cats](https://i.imgur.com/4NXrvB5.png)
+
 dockerized. will tweet and toot very good cats regularly.
 
 
