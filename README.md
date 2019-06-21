@@ -25,3 +25,5 @@ API tokens you put in there.)
 catbot is written in typescript, and the dockerfile will compile to js as part
 of its setup. run `npm run watch` if you're hacking on things and want to
 automatically recompile on changes.
+
+###### [more bots?](https://github.com/lostfictions?tab=repositories&q=botally)
