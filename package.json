@@ -1,7 +1,7 @@
 {
   "name": "catbot",
   "version": "1.0.0",
-  "description": "a bot that posts on both twitter and mastodon.",
+  "description": "a bot that posts cats on both twitter and mastodon.",
   "private": true,
   "main": "dist/main.js",
   "scripts": {
