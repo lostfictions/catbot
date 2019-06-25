@@ -90,9 +90,13 @@ export function makeStatus(catsMade: number): string {
     ? randomBagPreferred(adjs, catword, adjCount)
     : randomBag(adjs, adjCount);
 
-  const adj = chosenAdjs.join(
+  let adj = chosenAdjs.join(
     adjCount === 2 && Math.random() < 0.5 ? " and " : ", "
   );
+
+  if (adjCount === 1 && Math.random() < 0.1) {
+    adj = "very " + adj;
+  }
 
   const prefix = ((count: number) => {
     switch (count) {

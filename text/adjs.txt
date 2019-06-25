@@ -655,7 +655,6 @@ pervasive
 petrochemical
 philosophical
 picturesque
-pillaged
 piped
 piquant
 pitching
@@ -776,6 +775,7 @@ solid-state
 sometime
 sought-after
 spanked
+special
 specialized
 specific
 speedy
