@@ -4,7 +4,7 @@ import envalid from "envalid";
 const env = envalid.cleanEnv(
   process.env,
   {
-    DATA_DIR: envalid.str({ default: "gfx" }),
+    DATA_DIR: envalid.str({ default: "data" }),
     MASTODON_SERVER: envalid.url({ default: "https://mastodon.social" }),
     MASTODON_TOKEN: envalid.str({ default: "" }),
     TWITTER_CONSUMER_KEY: envalid.str({ default: "" }),
