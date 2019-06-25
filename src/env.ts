@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as envalid from "envalid";
+import fs from "fs";
+import envalid from "envalid";
 
 const env = envalid.cleanEnv(
   process.env,

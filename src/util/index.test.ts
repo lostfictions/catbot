@@ -1,4 +1,5 @@
-import * as jsc from "jsverify";
+/* global describe, test, expect */
+import jsc from "jsverify";
 
 import { randomByWeight, hsvToRGB } from "./index";
 

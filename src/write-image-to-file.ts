@@ -1,7 +1,7 @@
-import * as path from "path";
+import path from "path";
 import { tmpdir } from "os";
 
-import * as Jimp from "jimp";
+import Jimp from "jimp";
 
 let defaultFilenameIndex = 0;
 

@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as pluralize from "pluralize";
+import fs from "fs";
+import path from "path";
+import pluralize from "pluralize";
 
 import { randomInArray, randomBag, pluckOne } from "./util";
 
@@ -58,9 +58,7 @@ function randomBagPreferred(
   }
   if (results.length < count) {
     console.warn(
-      `not enough results! wanted: ${count} with preferred prefix ${preferred}, ${
-        arr.length
-      } results available`
+      `not enough results! wanted: ${count} with preferred prefix ${preferred}, ${arr.length} results available`
     );
   }
   return results;

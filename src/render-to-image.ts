@@ -1,7 +1,7 @@
-import * as fs from "fs";
+import fs from "fs";
 import { join, parse as parsePath } from "path";
 
-import * as Jimp from "jimp";
+import Jimp from "jimp";
 
 import { randomInArray, randomInt, randomFloat, hsvToRGB } from "./util";
 import { DATA_DIR } from "./env";

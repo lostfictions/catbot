@@ -3,7 +3,7 @@ require("source-map-support").install();
 import { scheduleJob } from "node-schedule";
 import { twoot, Configs as TwootConfigs } from "twoot";
 
-import * as Jimp from "jimp";
+import Jimp from "jimp";
 
 import { makeCat } from "./catmaker";
 import { renderToImage } from "./render-to-image";
