@@ -3,6 +3,7 @@ import path from "path";
 import pluralize from "pluralize";
 
 import { randomInArray, randomBag, pluckOne } from "./util";
+import { DATA_DIR } from "./env";
 
 const processFile = (filePath: string): string[] =>
   fs
@@ -64,8 +65,15 @@ function randomBagPreferred(
   return results;
 }
 
-let catWordsBag: string[] = [];
+const catWordsBagFile = path.join(DATA_DIR, "cat-words-bag");
 export function makeStatus(catsMade: number): string {
+  let catWordsBag: string[];
+  if (fs.existsSync(catWordsBagFile)) {
+    catWordsBag = fs.readFileSync(catWordsBagFile, "utf8").split("\n");
+  } else {
+    catWordsBag = [];
+  }
+
   // Refill our bag if we're not _entirely_ empty, but we're close. This way
   // we're not forced to cycle through every single name, but we'll see more
   // variation than full-random.
@@ -73,6 +81,8 @@ export function makeStatus(catsMade: number): string {
     catWordsBag = randomBag(wordsForCat);
   }
   const catword = pluralize(pluckOne(catWordsBag)!, catsMade);
+
+  fs.writeFileSync(catWordsBagFile, catWordsBag.join("\n"));
 
   const adjChance = Math.random();
   let adjCount;
