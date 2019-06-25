@@ -39,9 +39,9 @@ const directions: {
 ];
 
 interface TurnChance {
-  f: number;
-  l: number;
-  r: number;
+  f?: number;
+  l?: number;
+  r?: number;
 }
 
 const startDirection = 1;
@@ -160,7 +160,7 @@ function addCat(
 
     // update our current position and facing
     {
-      const nextDirection = randomByWeight(validTurns);
+      const nextDirection = randomByWeight(validTurns as Required<TurnChance>);
       const {
         part,
         delta: [dX, dY]
@@ -246,7 +246,7 @@ export function* makeCat(
   // only add turn chances to our object if they're nonzero!
   // we remove entries when checking turns, and randomByWeight
   // will fail if there's only zero-weighted values in the object.
-  const turnChance: any = {};
+  const turnChance: TurnChance = {};
   if (finalConfig.leftChance > 0) turnChance.l = finalConfig.leftChance;
   if (finalConfig.rightChance > 0) turnChance.r = finalConfig.rightChance;
   if (finalConfig.straightChance > 0) turnChance.f = finalConfig.straightChance;

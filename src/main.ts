@@ -2,8 +2,6 @@ require("source-map-support").install();
 
 import { twoot, Configs as TwootConfigs } from "twoot";
 
-import Jimp from "jimp";
-
 import { makeCat } from "./catmaker";
 import { renderToImage } from "./render-to-image";
 import { writeToFile } from "./write-image-to-file";
@@ -38,7 +36,7 @@ if (isValidTwitterConfiguration) {
   });
 }
 
-async function makeTwoot(): Promise<{ status: string; image: Jimp }> {
+async function makeTwoot() {
   const sizeChance = Math.random();
   const sizeMultiplier = sizeChance < 0.008 ? 3 : sizeChance < 0.02 ? 2 : 1;
 
