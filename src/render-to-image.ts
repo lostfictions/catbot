@@ -30,6 +30,7 @@ let cachedSprites: {
   spriteSize: [number, number];
   /** Normal color, light shade, dark shade */
   palette: [number, number, number];
+  special: Jimp;
 };
 
 async function loadSprites(): Promise<typeof cachedSprites> {
@@ -139,11 +140,14 @@ async function loadSprites(): Promise<typeof cachedSprites> {
     const lightShade = palette.getPixelColor(2, 0);
     const darkShade = palette.getPixelColor(3, 0);
 
+    const special = await Jimp.read(join(DATA_DIR, "mercat.png"));
+
     cachedSprites = {
       parts,
       overlays,
       spriteSize: spriteSize!,
-      palette: [normal, lightShade, darkShade]
+      palette: [normal, lightShade, darkShade],
+      special
     };
   }
 
@@ -152,13 +156,15 @@ async function loadSprites(): Promise<typeof cachedSprites> {
 
 export async function renderToImage(
   grid: CatParts[][],
-  params: CatConfig
+  params: CatConfig,
+  specialPos?: [number, number]
 ): Promise<Jimp> {
   const {
     parts,
     overlays,
     spriteSize: [sW, sH],
-    palette
+    palette,
+    special
   } = await loadSprites();
 
   const { gridSizeX, gridSizeY } = params;
@@ -184,14 +190,18 @@ export async function renderToImage(
     }
   }
 
+  if (specialPos) {
+    dest.blit(special, sW * specialPos[0], sH * specialPos[1]);
+  }
+
   ////////////////////
   // Some transforms:
   const mirror = Math.random();
   if (mirror < 0.1) {
     dest.mirror(true, false);
-  } else if (mirror < 0.14) {
+  } else if (mirror < 0.13 && !specialPos) {
     dest.mirror(true, true);
-  } else if (mirror < 0.18) {
+  } else if (mirror < 0.16 && !specialPos) {
     dest.mirror(false, true);
   }
 

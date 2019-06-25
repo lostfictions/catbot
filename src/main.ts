@@ -9,6 +9,7 @@ import { renderToImage } from "./render-to-image";
 import { writeToFile } from "./write-image-to-file";
 import { makeStatus } from "./text";
 
+import { CatParts } from "./cat-config";
 import { randomInt, randomByWeight } from "./util";
 import {
   MASTODON_SERVER,
@@ -76,9 +77,23 @@ async function makeTwoot(): Promise<{ status: string; image: Jimp }> {
   const steps = [...gen];
   const { grid, catsMade, config } = steps[steps.length - 1];
 
-  const image = await renderToImage(grid, config);
+  let specialPosition: [number, number] | undefined;
+  // 1/200 chance to search for it
+  if (Math.random() < 0.005) {
+    for (let y = 0; y < config.gridSizeY; y++) {
+      for (let x = 0; x < config.gridSizeX - 1; x++) {
+        const empty1 = grid[x][config.gridSizeY - y - 1] === CatParts.Empty;
+        const empty2 = grid[x + 1][config.gridSizeY - y - 1] === CatParts.Empty;
+        if (!specialPosition && empty1 && empty2 && Math.random() < 0.0001) {
+          specialPosition = [x, y];
+        }
+      }
+    }
+  }
 
-  const status = makeStatus(catsMade);
+  const image = await renderToImage(grid, config, specialPosition);
+
+  const status = makeStatus(catsMade + (specialPosition ? 1 : 0));
 
   return { status, image };
 }
@@ -100,11 +115,13 @@ async function doTwoot(): Promise<void> {
 }
 
 if (process.argv.slice(2).includes("local")) {
-  setInterval(async () => {
+  const loopCat = async () => {
     const { status, image } = await makeTwoot();
     const filename = await writeToFile(image);
     console.log(status, `file://${filename}`);
-  }, 4000);
+    setTimeout(loopCat, 1000);
+  };
+  loopCat();
 } else {
   doTwoot().then(() => {
     process.exit(0);
