@@ -10,8 +10,7 @@ const env = envalid.cleanEnv(
     TWITTER_CONSUMER_KEY: envalid.str({ default: "" }),
     TWITTER_CONSUMER_SECRET: envalid.str({ default: "" }),
     TWITTER_ACCESS_KEY: envalid.str({ default: "" }),
-    TWITTER_ACCESS_SECRET: envalid.str({ default: "" }),
-    CRON_RULE: envalid.str({ default: "0 0,4,8,12,16,20 * * *" })
+    TWITTER_ACCESS_SECRET: envalid.str({ default: "" })
   },
   { strict: true }
 );
@@ -23,8 +22,7 @@ export const {
   TWITTER_CONSUMER_KEY,
   TWITTER_CONSUMER_SECRET,
   TWITTER_ACCESS_KEY,
-  TWITTER_ACCESS_SECRET,
-  CRON_RULE
+  TWITTER_ACCESS_SECRET
 } = env;
 
 if (!fs.existsSync(DATA_DIR)) {

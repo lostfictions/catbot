@@ -1,6 +1,5 @@
 require("source-map-support").install();
 
-import { scheduleJob } from "node-schedule";
 import { twoot, Configs as TwootConfigs } from "twoot";
 
 import Jimp from "jimp";
@@ -19,8 +18,7 @@ import {
   TWITTER_CONSUMER_SECRET as consumerSecret,
   TWITTER_ACCESS_KEY as accessKey,
   TWITTER_ACCESS_SECRET as accessSecret,
-  isValidTwitterConfiguration,
-  CRON_RULE
+  isValidTwitterConfiguration
 } from "./env";
 
 const twootConfigs: TwootConfigs = [];
@@ -101,24 +99,14 @@ async function doTwoot(): Promise<void> {
   }
 }
 
-let job;
 if (process.argv.slice(2).includes("local")) {
-  // seems like scheduleJob doesn't like being passed async functions
-  // directly...?
-  const localJob = () => {
-    (async () => {
-      const { status, image } = await makeTwoot();
-      const filename = await writeToFile(image);
-      console.log(status, `file://${filename}`);
-    })();
-  };
-  localJob();
-  job = scheduleJob("*/10 * * * * *", localJob);
+  setInterval(async () => {
+    const { status, image } = await makeTwoot();
+    const filename = await writeToFile(image);
+    console.log(status, `file://${filename}`);
+  }, 4000);
 } else {
-  // we're running in production mode!
-  job = scheduleJob(CRON_RULE, doTwoot);
+  doTwoot().then(() => {
+    process.exit(0);
+  });
 }
-
-const now = new Date(Date.now()).toUTCString();
-const next = (job.nextInvocation() as any).toDate().toUTCString(); // bad typings
-console.log(`[${now}] Bot is running! Next job scheduled for [${next}]`);

@@ -94,8 +94,8 @@ export function randomByWeight(
     weights instanceof Map
       ? [...weights.entries()]
       : Array.isArray(weights)
-        ? weights
-        : Object.entries(weights);
+      ? weights
+      : Object.entries(weights);
 
   const keys: any[] = [];
   const values: number[] = [];
