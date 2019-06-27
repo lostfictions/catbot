@@ -13,8 +13,8 @@ this is a twitter and mastodon bot written in javascript
 you can run it on your computer or remix it into something new! you'll need node
 and [yarn](https://yarnpkg.com) (and git) installed. then run:
 ```
-git clone https://github.com/lostfictions/internetcoolguy
-cd internetcoolguy
+git clone https://github.com/lostfictions/catbot
+cd catbot
 yarn install
 yarn dev
 ```

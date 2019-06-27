@@ -14,7 +14,7 @@
     "test:jest": "jest --colors",
     "test:prettier": "prettier 'src/**' -l",
     "jest": "jest --watch --colors",
-    "prettier": "prettier 'src/**' -w"
+    "prettier": "prettier 'src/**' --write"
   },
   "author": "s <https://github.com/lostfictions>",
   "license": "AGPL-3.0",
