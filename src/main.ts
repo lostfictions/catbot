@@ -3,6 +3,7 @@ require("source-map-support").install();
 import { setTimeout } from "timers/promises";
 
 import { twoot } from "twoot";
+import { close as flushSentry } from "@sentry/node";
 
 import { makeCat } from "./catmaker";
 import { renderToImage } from "./render-to-image";
@@ -137,7 +138,9 @@ if (process.argv.slice(2).includes("local")) {
   };
   void loopCat();
 } else {
-  void doTwoot().then(() => {
-    process.exit(0);
-  });
+  void doTwoot()
+    .then(() => flushSentry(2000))
+    .then(() => {
+      process.exit(0);
+    });
 }
