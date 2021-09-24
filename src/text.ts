@@ -3,20 +3,22 @@ import path from "path";
 import pluralize from "pluralize";
 
 import { randomInArray, randomBag, pluckOne } from "./util";
-import { DATA_DIR } from "./env";
+import { PERSIST_DIR } from "./env";
+
+const catWordsBagFile = path.join(PERSIST_DIR, "cat-words-bag");
 
 const processFile = (filePath: string): string[] =>
   fs
-    .readFileSync(path.join(__dirname, filePath))
+    .readFileSync(filePath)
     .toString()
     .split("\n")
     .map((s) => s.trim())
     .filter((line) => line.length > 0 && !line.startsWith("#"));
 
-const adjs = processFile("../text/adjs.txt");
-const names = processFile("../text/names.txt");
-const veneryTerms = processFile("../text/venery-terms.txt");
-const wordsForCat = processFile("../text/words-for-cat.txt");
+const adjs = processFile("data/text/adjs.txt");
+const names = processFile("data/text/names.txt");
+const veneryTerms = processFile("data/text/venery-terms.txt");
+const wordsForCat = processFile("data/text/words-for-cat.txt");
 
 function an(word: string) {
   switch (true) {
@@ -65,7 +67,6 @@ function randomBagPreferred(
   return results;
 }
 
-const catWordsBagFile = path.join(DATA_DIR, "cat-words-bag");
 export function makeStatus(catsMade: number): string {
   let catWordsBag: string[];
   if (fs.existsSync(catWordsBagFile)) {

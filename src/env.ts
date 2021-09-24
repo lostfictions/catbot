@@ -5,7 +5,7 @@ import * as Sentry from "@sentry/node";
 import { CaptureConsole } from "@sentry/integrations";
 
 export const {
-  DATA_DIR,
+  PERSIST_DIR,
   MASTODON_TOKEN,
   TWITTER_API_KEY,
   TWITTER_API_SECRET,
@@ -16,7 +16,7 @@ export const {
 } = envalid.cleanEnv(
   process.env,
   {
-    DATA_DIR: envalid.str({ default: "data" }),
+    PERSIST_DIR: envalid.str({ default: "persist" }),
     MASTODON_TOKEN: envalid.str({ devDefault: "" }),
     TWITTER_API_KEY: envalid.str({ devDefault: "" }),
     TWITTER_API_SECRET: envalid.str({ devDefault: "" }),
@@ -27,8 +27,8 @@ export const {
   { strict: true }
 );
 
-if (!fs.existsSync(DATA_DIR)) {
-  throw new Error(`Data directory '${DATA_DIR}' doesn't exist!`);
+if (!fs.existsSync(PERSIST_DIR)) {
+  throw new Error(`Persistence directory '${PERSIST_DIR}' doesn't exist!`);
 }
 
 export const MASTODON_SERVER = "https://mastodon.social";

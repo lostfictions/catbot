@@ -4,9 +4,12 @@ import { join, parse as parsePath } from "path";
 import Jimp from "jimp";
 
 import { randomInArray, randomInt, randomFloat, hsvToRGB } from "./util";
-import { DATA_DIR } from "./env";
-
 import { CatParts, CatConfig } from "./cat-config";
+
+const OVERLAYS_DIR = "data/overlays";
+const PARTS_DIR = "data/parts";
+const PALETTE_PATH = "data/palette.png";
+const SPECIAL_PATH = "data/mercat.png";
 
 const filenameToPart: { [pattern: string]: CatParts } = {
   empty: CatParts.Empty,
@@ -41,10 +44,9 @@ async function loadSprites(): Promise<typeof cachedSprites> {
 
     const prefixes = Object.keys(filenameToPart);
 
-    const partsDirname = join(DATA_DIR, "parts");
-    const partsFilenames = fs.readdirSync(partsDirname);
+    const partsFilenames = fs.readdirSync(PARTS_DIR);
     if (partsFilenames.length === 0) {
-      throw new Error(`No files in image directory '${partsDirname}'`);
+      throw new Error(`No files in image directory '${PARTS_DIR}'`);
     }
 
     for (const fn of partsFilenames) {
@@ -55,7 +57,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
         );
       } else {
         // eslint-disable-next-line no-await-in-loop
-        const sprite = await Jimp.read(join(partsDirname, fn));
+        const sprite = await Jimp.read(join(PARTS_DIR, fn));
 
         const { width, height } = sprite.bitmap;
         // infer our sprite size from the first file we load
@@ -78,56 +80,51 @@ async function loadSprites(): Promise<typeof cachedSprites> {
       }
     }
 
-    const overlaysDirname = join(DATA_DIR, "overlays");
-    if (fs.existsSync(overlaysDirname)) {
-      const overlayFilenames = fs.readdirSync(overlaysDirname);
-      for (const fn of overlayFilenames) {
-        const [prefix, featureName] = parsePath(fn).name.split("-");
+    const overlayFilenames = fs.readdirSync(OVERLAYS_DIR);
+    for (const fn of overlayFilenames) {
+      const [prefix, featureName] = parsePath(fn).name.split("-");
 
-        // this is not great, but maybe good enough for now
-        if (prefix !== "head") {
-          console.warn(`currently unhandled overlay part: ${prefix}`);
-        } else {
-          // eslint-disable-next-line no-await-in-loop
-          const sprite = await Jimp.read(join(overlaysDirname, fn));
+      // this is not great, but maybe good enough for now
+      if (prefix !== "head") {
+        console.warn(`currently unhandled overlay part: ${prefix}`);
+      } else {
+        // eslint-disable-next-line no-await-in-loop
+        const sprite = await Jimp.read(join(OVERLAYS_DIR, fn));
 
-          const { width, height } = sprite.bitmap;
-          if (width !== spriteSize![0] || height !== spriteSize![1]) {
-            throw new Error(
-              `Inconsistent sprite size:\n` +
-                `Expected '${fn}' to be [${spriteSize!.join(", ")}],\n` +
-                `instead got [${width}, ${height}]`
-            );
+        const { width, height } = sprite.bitmap;
+        if (width !== spriteSize![0] || height !== spriteSize![1]) {
+          throw new Error(
+            `Inconsistent sprite size:\n` +
+              `Expected '${fn}' to be [${spriteSize!.join(", ")}],\n` +
+              `instead got [${width}, ${height}]`
+          );
+        }
+
+        const rotationMap = {
+          "head-u": 0,
+          "head-r": 90,
+          "head-d": 180,
+          "head-l": 270,
+        };
+
+        Object.entries(rotationMap).forEach(([partName, rotation]) => {
+          let featureMap = overlays[filenameToPart[partName]];
+          if (!featureMap) {
+            featureMap = {};
+            overlays[filenameToPart[partName]] = featureMap;
           }
 
-          const rotationMap = {
-            "head-u": 0,
-            "head-r": 90,
-            "head-d": 180,
-            "head-l": 270,
-          };
+          let arr = featureMap[featureName];
+          if (!Array.isArray(arr)) {
+            arr = [];
+            featureMap[featureName] = arr;
+          }
 
-          Object.entries(rotationMap).forEach(([partName, rotation]) => {
-            let featureMap = overlays[filenameToPart[partName]];
-            if (!featureMap) {
-              featureMap = {};
-              overlays[filenameToPart[partName]] = featureMap;
-            }
-
-            let arr = featureMap[featureName];
-            if (!Array.isArray(arr)) {
-              arr = [];
-              featureMap[featureName] = arr;
-            }
-
-            const rotated = sprite.clone();
-            rotated.rotate(rotation);
-            arr.push(rotated);
-          });
-        }
+          const rotated = sprite.clone();
+          rotated.rotate(rotation);
+          arr.push(rotated);
+        });
       }
-    } else {
-      console.warn(`Overlays dirname not found: "${overlaysDirname}"`);
     }
 
     // ensure there's at least one sprite for each part
@@ -137,12 +134,12 @@ async function loadSprites(): Promise<typeof cachedSprites> {
       }
     }
 
-    const palette = await Jimp.read(join(DATA_DIR, "palette.png"));
+    const palette = await Jimp.read(PALETTE_PATH);
     const normal = palette.getPixelColor(1, 0);
     const lightShade = palette.getPixelColor(2, 0);
     const darkShade = palette.getPixelColor(3, 0);
 
-    const special = await Jimp.read(join(DATA_DIR, "mercat.png"));
+    const special = await Jimp.read(SPECIAL_PATH);
 
     cachedSprites = {
       parts,
