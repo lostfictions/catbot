@@ -4664,10 +4664,10 @@ twitter-api-client@^1.3.8:
     oauth "^0.9.15"
     object-sizeof "^1.6.1"
 
-twoot@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/twoot/-/twoot-0.1.1.tgz#13d5eaef44edb003ad408e8229e090f22bc84b04"
-  integrity sha512-7UZbEQazSwoYpvWrwKuTg4iwnI6bbB+T+pIyny6TJ9HYhFWmCs0yUUYAq1MhoiOPSwAiUYwctY2IaqBCdMxTUA==
+twoot@0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/twoot/-/twoot-0.1.2.tgz#d53e6d2f54b66ae6fde99bbf53ab708254cf9ac8"
+  integrity sha512-pGZtNt+nhSq9v/YB/HpN3y2dfndq/pHkNE04IdWfYYfCSrtIiR+M1aFUPtG32dBoTr0HP1o/70eVnd4DsKjTIA==
   dependencies:
     async-retry "^1.3.3"
     masto "^4.1.14"
