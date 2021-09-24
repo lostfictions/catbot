@@ -10,8 +10,8 @@ const processFile = (filePath: string): string[] =>
     .readFileSync(path.join(__dirname, filePath))
     .toString()
     .split("\n")
-    .map(s => s.trim())
-    .filter(line => line.length > 0 && !line.startsWith("#"));
+    .map((s) => s.trim())
+    .filter((line) => line.length > 0 && !line.startsWith("#"));
 
 const adjs = processFile("../text/adjs.txt");
 const names = processFile("../text/names.txt");
@@ -43,15 +43,15 @@ function randomBagPreferred(
 ): string[] {
   const results = [
     ...randomBag(
-      arr.filter(a => a.toLowerCase().startsWith(preferred[0].toLowerCase())),
+      arr.filter((a) => a.toLowerCase().startsWith(preferred[0].toLowerCase())),
       count
-    )
+    ),
   ];
   if (results.length < count) {
     results.push(
       ...randomBag(
         arr.filter(
-          a => !a.toLowerCase().startsWith(preferred[0].toLowerCase())
+          (a) => !a.toLowerCase().startsWith(preferred[0].toLowerCase())
         ),
         count - results.length
       )
@@ -131,9 +131,10 @@ export function makeStatus(catsMade: number): string {
 
   let chosenNames = "";
   if (catsMade <= 5 && Math.random() < 0.18) {
-    chosenNames = (alliterate
-      ? randomBagPreferred(names, catword, catsMade)
-      : randomBag(names, catsMade)
+    chosenNames = (
+      alliterate
+        ? randomBagPreferred(names, catword, catsMade)
+        : randomBag(names, catsMade)
     ).join(catsMade === 2 ? " and " : ", ");
 
     if (catsMade === 1) {
@@ -144,14 +145,12 @@ export function makeStatus(catsMade: number): string {
       } else {
         chosenNames = ` (${chosenNames})`;
       }
+    } else if (Math.random() < 0.3) {
+      chosenNames = ` (${chosenNames})`;
+    } else if (Math.random() < 0.6) {
+      chosenNames = `: ${chosenNames}`;
     } else {
-      if (Math.random() < 0.3) {
-        chosenNames = ` (${chosenNames})`;
-      } else if (Math.random() < 0.6) {
-        chosenNames = `: ${chosenNames}`;
-      } else {
-        chosenNames = ` (named ${chosenNames})`;
-      }
+      chosenNames = ` (named ${chosenNames})`;
     }
   }
 

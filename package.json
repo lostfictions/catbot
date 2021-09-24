@@ -1,53 +1,56 @@
 {
   "name": "catbot",
-  "version": "1.0.0",
-  "description": "a bot that posts cats on both twitter and mastodon.",
   "private": true,
+  "version": "1.0.0",
+  "author": "s <https://github.com/lostfictions>",
+  "license": "AGPL-3.0",
+  "description": "a bot that posts cats on both twitter and mastodon.",
   "main": "dist/main.js",
   "scripts": {
     "start": "node dist/main.js",
-    "dev": "ts-node-dev --respawn --transpile-only --notify=false src/main.ts -- local",
+    "dev": "ts-node-dev -T --respawn --notify=false src/main.ts -- local",
     "build": "rm -rf dist/ && tsc",
     "test": "run-s -l test:*",
     "test:ts": "tsc --noEmit",
-    "test:lint": "eslint ./src --ext .ts,.tsx",
+    "test:eslint": "eslint --color 'src/**/*'",
     "test:jest": "jest --colors",
     "test:prettier": "prettier 'src/**' -l",
     "jest": "jest --watch --colors",
-    "prettier": "prettier 'src/**' --write"
+    "prettier": "prettier 'src/**/*' --write"
   },
-  "author": "s <https://github.com/lostfictions>",
-  "license": "AGPL-3.0",
   "dependencies": {
-    "envalid": "^5.0.0",
+    "@sentry/integrations": "^6.13.1",
+    "@sentry/node": "^6.13.1",
+    "envalid": "^6.0.2",
     "jimp": "^0.2.28",
     "pluralize": "^7.0.0",
-    "source-map-support": "^0.5.12",
-    "twoot": "0.0.3"
+    "source-map-support": "^0.5.20",
+    "twoot": "0.1.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.15",
-    "@types/node": "^12.0.10",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.9.6",
     "@types/pluralize": "^0.0.29",
-    "@typescript-eslint/eslint-plugin": "^1.10.2",
-    "@typescript-eslint/parser": "^1.10.2",
-    "eslint": "^5.4.0",
-    "eslint-config-prettier": "^5.0.0",
-    "jest": "^24.8.0",
+    "eslint": "^7.32.0",
+    "eslint-config-lostfictions": "^1.3.0",
+    "jest": "^27.2.1",
     "jsverify": "^0.8.4",
     "npm-run-all": "^4.1.5",
-    "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
-    "ts-node-dev": "^1.0.0-pre.40",
-    "typescript": "^3.5.2"
+    "prettier": "^2.4.1",
+    "ts-jest": "^27.0.5",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.3"
   },
   "engines": {
-    "node": ">=12.1.0"
+    "node": ">=16.9.1"
   },
   "jest": {
-    "preset": "ts-jest",
-    "roots": [
-      "<rootDir>/src/"
-    ]
+    "preset": "ts-jest/presets/js-with-ts",
+    "rootDir": "src",
+    "globals": {
+      "ts-jest": {
+        "isolatedModules": true
+      }
+    }
   }
 }

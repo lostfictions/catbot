@@ -22,5 +22,5 @@ export const enum CatParts {
   EndR = ">",
   EndU = "^",
   EndL = "<",
-  EndD = "v"
+  EndD = "v",
 }

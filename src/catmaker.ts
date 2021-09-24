@@ -16,26 +16,26 @@ const directions: {
   {
     f: { part: CatParts.LR, delta: [1, 0] },
     l: { part: CatParts.UL, delta: [0, 1] },
-    r: { part: CatParts.DL, delta: [0, -1] }
+    r: { part: CatParts.DL, delta: [0, -1] },
   },
   // facing up
   {
     f: { part: CatParts.UD, delta: [0, 1] },
     l: { part: CatParts.DL, delta: [-1, 0] },
-    r: { part: CatParts.DR, delta: [1, 0] }
+    r: { part: CatParts.DR, delta: [1, 0] },
   },
   // facing left
   {
     f: { part: CatParts.LR, delta: [-1, 0] },
     l: { part: CatParts.DR, delta: [0, -1] },
-    r: { part: CatParts.UR, delta: [0, 1] }
+    r: { part: CatParts.UR, delta: [0, 1] },
   },
   // facing down
   {
     f: { part: CatParts.UD, delta: [0, -1] },
     l: { part: CatParts.UR, delta: [1, 0] },
-    r: { part: CatParts.UL, delta: [-1, 0] }
-  }
+    r: { part: CatParts.UL, delta: [-1, 0] },
+  },
 ];
 
 interface TurnChance {
@@ -99,8 +99,8 @@ function addCat(
     for (const [
       nextDir,
       {
-        delta: [dX, dY]
-      }
+        delta: [dX, dY],
+      },
     ] of Object.entries(nextDirections)) {
       // don't go out of bounds, and stop 1 below the top row so we always have
       // space for the head
@@ -163,7 +163,7 @@ function addCat(
       const nextDirection = randomByWeight(validTurns as Required<TurnChance>);
       const {
         part,
-        delta: [dX, dY]
+        delta: [dX, dY],
       } = nextDirections[nextDirection];
 
       steps.push({ prevSprite: grid[x][y], delta: [dX, dY] });
@@ -223,9 +223,7 @@ function addCat(
 
 export type CatOptions = Partial<CatConfig>;
 
-export function* makeCat(
-  config: CatOptions = {}
-): IterableIterator<{
+export function* makeCat(config: CatOptions = {}): IterableIterator<{
   grid: CatParts[][];
   catsMade: number;
   config: CatConfig;
@@ -238,7 +236,7 @@ export function* makeCat(
     minSteps: randomInt(2, 20),
     maxSteps: randomInt(30, 60),
     gridSizeX: 16,
-    gridSizeY: 9
+    gridSizeY: 9,
   };
 
   const finalConfig: CatConfig = { ...defaultConfig, ...config };
@@ -269,6 +267,6 @@ export function* makeCat(
   yield {
     grid,
     catsMade,
-    config: finalConfig
+    config: finalConfig,
   };
 }

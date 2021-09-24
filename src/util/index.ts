@@ -17,23 +17,29 @@ export function escapeForRegex(expression: string): string {
 }
 
 /** Returns a random number between min (inclusive) and max (inclusive). */
-export function randomFloat(max: number): number;
+// eslint-disable-next-line @typescript-eslint/unified-signatures
 export function randomFloat(min: number, max: number): number;
+export function randomFloat(max: number): number;
 export function randomFloat(min: number, max?: number): number {
-  if (typeof max === "undefined") {
+  /* eslint-disable no-param-reassign */
+  if (max == null) {
     max = min;
     min = 0;
   }
   if (max < min) {
     [min, max] = [max, min];
   }
+  /* eslint-enable no-param-reassign */
+
   return Math.random() * (max - min) + min;
 }
 
 /** Returns a random number between min (inclusive) and max (exclusive). */
-export function randomInt(max: number): number;
+// eslint-disable-next-line @typescript-eslint/unified-signatures
 export function randomInt(min: number, max: number): number;
+export function randomInt(max: number): number;
 export function randomInt(min: number, max?: number): number {
+  /* eslint-disable no-param-reassign */
   if (typeof max === "undefined") {
     max = min;
     min = 0;
@@ -41,6 +47,8 @@ export function randomInt(min: number, max?: number): number {
   if (max < min) {
     [min, max] = [max, min];
   }
+  /* eslint-enable no-param-reassign */
+
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
@@ -54,11 +62,13 @@ export function randomInArray<T>(arr: T[]): T {
  */
 export function randomBag<T>(arr: T[], count = arr.length): T[] {
   if (count === 1) return [randomInArray(arr)];
+
+  let remaining = count;
   const values = [];
   const bag = [...arr];
-  while (count > 0 && bag.length > 0) {
+  while (remaining > 0 && bag.length > 0) {
     values.push(...bag.splice(Math.floor(Math.random() * bag.length), 1));
-    count--;
+    remaining--;
   }
   return values;
 }
@@ -71,10 +81,12 @@ export function pluckOne<T>(arr: T[]): T | undefined {
 
 /** Removes `count` values at random from the given array and returns them. */
 export function pluck<T>(arr: T[], count: number): T[] {
+  let remaining = count;
   const pluckedValues: T[] = [];
-  while (count > 0 && arr.length > 0) {
+  while (remaining > 0 && arr.length > 0) {
     const index = Math.floor(Math.random() * arr.length);
     pluckedValues.push(...arr.splice(index, 1));
+    remaining--;
   }
   return pluckedValues;
 }
@@ -82,11 +94,10 @@ export function pluck<T>(arr: T[], count: number): T[] {
 export interface WeightedValues {
   [value: string]: number;
 }
-export function randomByWeight<T>(weights: [T, number][]): T;
-export function randomByWeight<T>(weights: Map<T, number>): T;
 export function randomByWeight<T extends WeightedValues, K extends keyof T>(
   weights: T
 ): K;
+export function randomByWeight<T>(weights: [T, number][] | Map<T, number>): T;
 export function randomByWeight(
   weights: [any, number][] | Map<any, number> | WeightedValues
 ): any {

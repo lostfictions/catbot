@@ -21,7 +21,7 @@ const filenameToPart: { [pattern: string]: CatParts } = {
   "head-r": CatParts.EndR,
   "head-u": CatParts.EndU,
   "head-l": CatParts.EndL,
-  "head-d": CatParts.EndD
+  "head-d": CatParts.EndD,
 };
 
 let cachedSprites: {
@@ -48,12 +48,13 @@ async function loadSprites(): Promise<typeof cachedSprites> {
     }
 
     for (const fn of partsFilenames) {
-      const prefix = prefixes.find(p => fn.startsWith(p));
+      const prefix = prefixes.find((p) => fn.startsWith(p));
       if (!prefix) {
         console.warn(
           `Filename pattern doesn't match any known part prefix: '${fn}'`
         );
       } else {
+        // eslint-disable-next-line no-await-in-loop
         const sprite = await Jimp.read(join(partsDirname, fn));
 
         const { width, height } = sprite.bitmap;
@@ -87,6 +88,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
         if (prefix !== "head") {
           console.warn(`currently unhandled overlay part: ${prefix}`);
         } else {
+          // eslint-disable-next-line no-await-in-loop
           const sprite = await Jimp.read(join(overlaysDirname, fn));
 
           const { width, height } = sprite.bitmap;
@@ -102,7 +104,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
             "head-u": 0,
             "head-r": 90,
             "head-d": 180,
-            "head-l": 270
+            "head-l": 270,
           };
 
           Object.entries(rotationMap).forEach(([partName, rotation]) => {
@@ -147,7 +149,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
       overlays,
       spriteSize: spriteSize!,
       palette: [normal, lightShade, darkShade],
-      special
+      special,
     };
   }
 
@@ -164,7 +166,7 @@ export async function renderToImage(
     overlays,
     spriteSize: [sW, sH],
     palette,
-    special
+    special,
   } = await loadSprites();
 
   const { gridSizeX, gridSizeY } = params;
@@ -182,10 +184,10 @@ export async function renderToImage(
       dest.blit(sprite, sW * x, sH * y);
       // just default to one of each feature type for now
       if (overlays[partType]) {
-        Object.values(overlays[partType]).forEach(feature => {
+        for (const feature of Object.values(overlays[partType])) {
           const featureSprite = randomInArray(feature);
           dest.composite(featureSprite, sW * x, sH * y);
-        });
+        }
       }
     }
   }
@@ -225,7 +227,7 @@ export async function renderToImage(
     darkShade[1] *= randomFloat(0.7, 0.9);
     darkShade[2] *= randomFloat(0.4, 0.7);
 
-    const replacement = [baseColor, lightShade, darkShade].map(c => {
+    const replacement = [baseColor, lightShade, darkShade].map((c) => {
       const [r, g, b] = hsvToRGB(c as [number, number, number]);
       const a = didMakeTransparent
         ? Math.random() < 0.3
@@ -247,7 +249,7 @@ export async function renderToImage(
   const bgColor: [number, number, number] = [
     randomInt(0, 360),
     randomInt(10, 50),
-    randomInt(10, 80)
+    randomInt(10, 80),
   ];
   const [bgR, bgG, bgB] = hsvToRGB(bgColor);
   const bgCol = Jimp.rgbaToInt(bgR, bgG, bgB, 255);
@@ -263,15 +265,15 @@ export async function renderToImage(
     const silhouetteCol =
       "#" +
       [randomInt(50), randomInt(50), randomInt(50)]
-        .map(i => i.toString(16))
-        .map(c => (c.length < 2 ? "0" + c : c))
+        .map((i) => i.toString(16))
+        .map((c) => (c.length < 2 ? "0" + c : c))
         .join("");
 
     (silhouette as any).color([
       {
         apply: "mix",
-        params: [silhouetteCol, 100]
-      }
+        params: [silhouetteCol, 100],
+      },
     ]);
 
     bg.composite(silhouette, randomInt(-3, 4), randomInt(-3, 4));

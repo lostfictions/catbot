@@ -10,7 +10,7 @@ export async function writeToFile(
   filename = path.join(tmpdir(), `catbot_${defaultFilenameIndex++}.png`)
 ): Promise<string> {
   return new Promise<string>((res, rej) => {
-    image.write(filename, e => {
+    image.write(filename, (e) => {
       if (e) {
         rej(e);
       } else {

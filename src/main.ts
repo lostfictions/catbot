@@ -1,6 +1,8 @@
 require("source-map-support").install();
 
-import { twoot, Configs as TwootConfigs } from "twoot";
+import { setTimeout } from "timers/promises";
+
+import { twoot } from "twoot";
 
 import { makeCat } from "./catmaker";
 import { renderToImage } from "./render-to-image";
@@ -12,29 +14,11 @@ import { randomInt, randomByWeight } from "./util";
 import {
   MASTODON_SERVER,
   MASTODON_TOKEN,
-  isValidMastodonConfiguration,
-  TWITTER_CONSUMER_KEY as consumerKey,
-  TWITTER_CONSUMER_SECRET as consumerSecret,
-  TWITTER_ACCESS_KEY as accessKey,
-  TWITTER_ACCESS_SECRET as accessSecret,
-  isValidTwitterConfiguration
+  TWITTER_API_KEY,
+  TWITTER_API_SECRET,
+  TWITTER_ACCESS_TOKEN,
+  TWITTER_ACCESS_SECRET,
 } from "./env";
-
-const twootConfigs: TwootConfigs = [];
-if (isValidMastodonConfiguration) {
-  twootConfigs.push({
-    token: MASTODON_TOKEN,
-    server: MASTODON_SERVER
-  });
-}
-if (isValidTwitterConfiguration) {
-  twootConfigs.push({
-    consumerKey,
-    consumerSecret,
-    accessKey,
-    accessSecret
-  });
-}
 
 async function makeTwoot() {
   const sizeChance = Math.random();
@@ -47,29 +31,41 @@ async function makeTwoot() {
   const tallMultiplier = tallChance < 0.015 ? 3 : tallChance < 0.045 ? 2 : 1;
 
   const gen = makeCat({
-    catChance: randomByWeight([[80, 10], [90, 5], [100, 10]]),
+    catChance: randomByWeight([
+      [80, 10],
+      [90, 5],
+      [100, 10],
+    ]),
     leftChance: randomByWeight([
       [0, 1],
       [randomInt(50), 0],
       [50, 20],
-      [randomInt(50, 100), 10]
+      [randomInt(50, 100), 10],
     ]),
     rightChance: randomByWeight([
       [0, 1],
       [randomInt(50), 0],
       [50, 20],
-      [randomInt(50, 100), 10]
+      [randomInt(50, 100), 10],
     ]),
     straightChance: randomByWeight([
       [0, 1],
       [randomInt(50), 0],
       [50, 20],
-      [randomInt(50, 100), 10]
+      [randomInt(50, 100), 10],
     ]),
-    minSteps: randomByWeight([[1, 1], [randomInt(5, 15), 20], [50, 1]]),
-    maxSteps: randomByWeight([[1, 1], [randomInt(30, 60), 20], [100, 1]]),
+    minSteps: randomByWeight([
+      [1, 1],
+      [randomInt(5, 15), 20],
+      [50, 1],
+    ]),
+    maxSteps: randomByWeight([
+      [1, 1],
+      [randomInt(30, 60), 20],
+      [100, 1],
+    ]),
     gridSizeX: 16 * sizeMultiplier * wideMultiplier,
-    gridSizeY: 9 * sizeMultiplier * tallMultiplier
+    gridSizeY: 9 * sizeMultiplier * tallMultiplier,
   });
 
   const steps = [...gen];
@@ -100,15 +96,34 @@ async function doTwoot(): Promise<void> {
   const { status, image } = await makeTwoot();
   const filename = await writeToFile(image);
 
-  try {
-    const urls = await twoot(twootConfigs, status, [filename]);
-    console.log(
-      `[${new Date().toUTCString()}] twooted:\n${urls
-        .map(u => "\t -> " + u)
-        .join("\n")}`
-    );
-  } catch (e) {
-    console.error("error while trying to twoot: ", e);
+  const [mastoResult, twitterResult] = await twoot(
+    { status, media: [{ path: filename }] },
+    [
+      {
+        type: "mastodon",
+        server: MASTODON_SERVER,
+        token: MASTODON_TOKEN,
+      },
+      {
+        type: "twitter",
+        apiKey: TWITTER_API_KEY,
+        apiSecret: TWITTER_API_SECRET,
+        accessToken: TWITTER_ACCESS_TOKEN,
+        accessSecret: TWITTER_ACCESS_SECRET,
+      },
+    ]
+  );
+
+  if (mastoResult.type === "error") {
+    console.error(mastoResult.message);
+  } else {
+    console.log(mastoResult.message);
+  }
+
+  if (twitterResult.type === "error") {
+    console.error(twitterResult.message);
+  } else {
+    console.log(twitterResult.message);
   }
 }
 
@@ -117,11 +132,12 @@ if (process.argv.slice(2).includes("local")) {
     const { status, image } = await makeTwoot();
     const filename = await writeToFile(image);
     console.log(status, `file://${filename}`);
-    setTimeout(loopCat, 1000);
+    await setTimeout(1000);
+    void loopCat();
   };
-  loopCat();
+  void loopCat();
 } else {
-  doTwoot().then(() => {
+  void doTwoot().then(() => {
     process.exit(0);
   });
 }

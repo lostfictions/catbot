@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2020",
     "module": "commonjs",
     "lib": [
-      "dom",
-      "es2017"
+      "es2020"
     ],
     "strict": true,
     "sourceMap": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "rootDir": "./src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "skipLibCheck": true
   },
   "include": [
     "src"
