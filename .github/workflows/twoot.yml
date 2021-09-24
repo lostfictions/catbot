@@ -1,0 +1,41 @@
+name: twoot on a schedule
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 0,3,6,9,12,15,18,21 * * *"
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          # disjoint branch with "unused concept" data
+          ref: "persist"
+          path: "persist"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16.9.1"
+          cache: "yarn"
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn start
+        env:
+          DATA_DIR: "persist"
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      - name: Commit and push if changed
+        run: |-
+          cd persist
+          git config user.name "Automated"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          timestamp=$(date -u)
+          git commit -m "Latest data: ${timestamp}" || exit 0
+          git push
