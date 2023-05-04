@@ -1,4 +1,4 @@
-require("@rushstack/eslint-patch/modern-module-resolution");
+require("eslint-config-lostfictions/patch");
 module.exports = {
   extends: ["lostfictions"],
   parserOptions: { tsconfigRootDir: __dirname },

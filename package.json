@@ -10,7 +10,7 @@
     "start": "NODE_ENV=production node --enable-source-maps dist/main.js",
     "dev": "NODE_ENV=development ts-node-dev -T --respawn --notify=false src/main.ts -- local",
     "build": "rm -rf dist/ && tsc",
-    "test": "run-s -l test:*",
+    "test": "run-p -cl test:*",
     "test:ts": "tsc --noEmit",
     "test:eslint": "eslint --color 'src/**/*'",
     "test:jest": "jest --colors",
