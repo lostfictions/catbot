@@ -13,7 +13,7 @@ export function wrap(value: number, max: number) {
  * @returns The escaped string, usable in a regular expression constructor.
  */
 export function escapeForRegex(expression: string): string {
-  return expression.replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
+  return expression.replaceAll(/[\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
 /** Returns a random number between min (inclusive) and max (inclusive). */
@@ -40,7 +40,7 @@ export function randomInt(min: number, max: number): number;
 export function randomInt(max: number): number;
 export function randomInt(min: number, max?: number): number {
   /* eslint-disable no-param-reassign */
-  if (typeof max === "undefined") {
+  if (max === undefined) {
     max = min;
     min = 0;
   }
@@ -110,10 +110,10 @@ export function randomByWeight(
 
   const keys: any[] = [];
   const values: number[] = [];
-  weightPairs.forEach(([k, v]) => {
+  for (const [k, v] of weightPairs) {
     keys.push(k);
     values.push(v);
-  });
+  }
 
   const sum = values.reduce((p, c) => {
     if (c < 0) throw new Error("Negative weight!");
@@ -151,7 +151,8 @@ export function rgbToHSV(
   const diffc = (c: number) => (v - c) / 6 / diff + 1 / 2;
 
   if (diff === 0) {
-    h = s = 0;
+    h = 0;
+    s = 0;
   } else {
     s = diff / v;
     const rdif = diffc(r);

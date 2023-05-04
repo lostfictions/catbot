@@ -1,5 +1,7 @@
+/* eslint-disable node/no-process-env */
 import fs from "fs";
-import envalid from "envalid";
+
+import { z, parseEnv } from "znv";
 
 import * as Sentry from "@sentry/node";
 import { CaptureConsole } from "@sentry/integrations";
@@ -12,20 +14,44 @@ export const {
   TWITTER_ACCESS_TOKEN,
   TWITTER_ACCESS_SECRET,
   SENTRY_DSN,
-  isDev,
-} = envalid.cleanEnv(
-  process.env,
-  {
-    PERSIST_DIR: envalid.str({ default: "persist" }),
-    MASTODON_TOKEN: envalid.str({ devDefault: "" }),
-    TWITTER_API_KEY: envalid.str({ devDefault: "" }),
-    TWITTER_API_SECRET: envalid.str({ devDefault: "" }),
-    TWITTER_ACCESS_TOKEN: envalid.str({ devDefault: "" }),
-    TWITTER_ACCESS_SECRET: envalid.str({ devDefault: "" }),
-    SENTRY_DSN: envalid.str({ default: "" }),
+} = parseEnv(process.env, {
+  PERSIST_DIR: z.string().min(1).default("persist"),
+  MASTODON_TOKEN: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "dev",
+    },
   },
-  { strict: true }
-);
+  TWITTER_API_KEY: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "dev",
+    },
+  },
+  TWITTER_API_SECRET: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "dev",
+    },
+  },
+  TWITTER_ACCESS_TOKEN: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "dev",
+    },
+  },
+  TWITTER_ACCESS_SECRET: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "dev",
+    },
+  },
+  SENTRY_DSN: {
+    schema: z.string().min(1).optional(),
+  },
+});
+
+export const isDev = process.env["NODE_ENV"] !== "production";
 
 if (!fs.existsSync(PERSIST_DIR)) {
   throw new Error(`Persistence directory '${PERSIST_DIR}' doesn't exist!`);
@@ -33,7 +59,7 @@ if (!fs.existsSync(PERSIST_DIR)) {
 
 export const MASTODON_SERVER = "https://mastodon.social";
 
-if (SENTRY_DSN.length === 0 && !isDev) {
+if (!SENTRY_DSN && !isDev) {
   console.warn(
     `Sentry DSN is invalid! Error reporting to Sentry will be disabled.`
   );

@@ -1,4 +1,3 @@
-/* global describe, test, expect */
 import jsc from "jsverify";
 
 import { randomByWeight, hsvToRGB } from "./index";
@@ -21,7 +20,7 @@ describe("random by weight", () => {
     }
   );
 
-  test("with integer weights", () => {
+  it("does not throw when using integer weights", () => {
     expect(() =>
       randomByWeight({
         dog: 1,
@@ -30,7 +29,7 @@ describe("random by weight", () => {
     ).not.toThrow();
   });
 
-  test("with float weights", () => {
+  it("does not throw when using float weights", () => {
     expect(() =>
       randomByWeight({
         dog: 0.1,
@@ -54,14 +53,14 @@ describe("random by weight", () => {
     ).not.toThrow();
   });
 
-  test("with zero weights", () => {
+  it("does not select entries with weight 0", () => {
     expect(
       randomByWeight({
         cat: 1,
         dog: 0,
         flower: 0,
       })
-    ).toEqual("cat");
+    ).toBe("cat");
 
     expect(
       randomByWeight({
@@ -69,7 +68,7 @@ describe("random by weight", () => {
         flower: 0,
         cat: 1,
       })
-    ).toEqual("cat");
+    ).toBe("cat");
 
     expect(
       randomByWeight({
@@ -77,7 +76,7 @@ describe("random by weight", () => {
         cat: 1,
         flower: 0,
       })
-    ).toEqual("cat");
+    ).toBe("cat");
 
     expect(
       randomByWeight({
@@ -85,14 +84,14 @@ describe("random by weight", () => {
         cat: 0.1,
         flower: 0,
       })
-    ).toEqual("cat");
+    ).toBe("cat");
 
     expect(
       randomByWeight({
         cat: 0.001,
         dog: 0,
       })
-    ).toEqual("cat");
+    ).toBe("cat");
   });
 });
 

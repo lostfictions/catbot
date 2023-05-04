@@ -56,7 +56,6 @@ async function loadSprites(): Promise<typeof cachedSprites> {
           `Filename pattern doesn't match any known part prefix: '${fn}'`
         );
       } else {
-        // eslint-disable-next-line no-await-in-loop
         const sprite = await Jimp.read(join(PARTS_DIR, fn));
 
         const { width, height } = sprite.bitmap;
@@ -88,7 +87,6 @@ async function loadSprites(): Promise<typeof cachedSprites> {
       if (prefix !== "head") {
         console.warn(`currently unhandled overlay part: ${prefix}`);
       } else {
-        // eslint-disable-next-line no-await-in-loop
         const sprite = await Jimp.read(join(OVERLAYS_DIR, fn));
 
         const { width, height } = sprite.bitmap;
@@ -107,7 +105,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
           "head-l": 270,
         };
 
-        Object.entries(rotationMap).forEach(([partName, rotation]) => {
+        for (const [partName, rotation] of Object.entries(rotationMap)) {
           let featureMap = overlays[filenameToPart[partName]];
           if (!featureMap) {
             featureMap = {};
@@ -123,7 +121,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
           const rotated = sprite.clone();
           rotated.rotate(rotation);
           arr.push(rotated);
-        });
+        }
       }
     }
 
@@ -141,6 +139,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
 
     const special = await Jimp.read(SPECIAL_PATH);
 
+    // eslint-disable-next-line require-atomic-updates
     cachedSprites = {
       parts,
       overlays,
@@ -259,12 +258,10 @@ export async function renderToImage(
   // don't make a silhouette if we're transparent!
   if (!didMakeTransparent && Math.random() < 0.8) {
     const silhouette = dest.clone();
-    const silhouetteCol =
-      "#" +
-      [randomInt(50), randomInt(50), randomInt(50)]
-        .map((i) => i.toString(16))
-        .map((c) => (c.length < 2 ? "0" + c : c))
-        .join("");
+    const silhouetteCol = `#${[randomInt(50), randomInt(50), randomInt(50)]
+      .map((i) => i.toString(16))
+      .map((c) => (c.length < 2 ? `0${c}` : c))
+      .join("")}`;
 
     (silhouette as any).color([
       {

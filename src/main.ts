@@ -1,5 +1,3 @@
-require("source-map-support").install();
-
 import { setTimeout } from "timers/promises";
 
 import { twoot } from "twoot";
@@ -70,7 +68,7 @@ async function makeTwoot() {
   });
 
   const steps = [...gen];
-  const { grid, catsMade, config } = steps[steps.length - 1];
+  const { grid, catsMade, config } = steps.at(-1)!;
 
   let specialPosition: [number, number] | undefined;
   // 1/200 chance to search for it

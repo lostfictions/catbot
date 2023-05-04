@@ -41,7 +41,7 @@ function an(word: string) {
 function randomBagPreferred(
   arr: string[],
   preferred: string,
-  count: number = 1
+  count = 1
 ): string[] {
   const results = [
     ...randomBag(
@@ -106,7 +106,7 @@ export function makeStatus(catsMade: number): string {
   );
 
   if (adjCount === 1 && Math.random() < 0.1) {
-    adj = "very " + adj;
+    adj = `very ${adj}`;
   }
 
   const prefix = ((count: number) => {
