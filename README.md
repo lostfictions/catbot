@@ -36,10 +36,4 @@ additionally, `MASTODON_SERVER` (hardcoded in [src/env.ts](src/env.ts)) controls
 the mastodon instance to which API calls should be made (usually where the bot
 user lives.)
 
-catbot uses the [envalid](https://github.com/af/envalid) package which in turn
-wraps [dotenv](https://github.com/motdotla/dotenv), so you can alternately stick
-any of the above environment variables in a file named `.env` in the project
-root. (it's gitignored, so there's no risk of accidentally committing private
-API tokens you put in there.)
-
 ###### [more bots?](https://github.com/lostfictions?tab=repositories&q=botally)
