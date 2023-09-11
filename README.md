@@ -1,6 +1,9 @@
 ## catbot
 
-a twitter and mastodon bot for node. tweets and toots very good friends.
+a ~~twitter and~~ mastodon bot for node. ~~tweets and~~ toots very good friends.
+
+> twitter support was removed in 2023 following twitter api changes which
+> resulted in the shutdown of most bots.
 
 ![some cats](https://i.imgur.com/bWQ7Y75.png)
 
@@ -16,21 +19,18 @@ yarn install
 yarn dev
 ```
 
-in a server environment, this bot can be run with
-[docker](https://docs.docker.com/) for an easier time. (i recommend
-[dokku](https://dokku.com/) if you're looking for a nice way to develop and host
-bots.)
+this bot runs on github actions. check [the workflow
+file](.github/workflows/twoot.yml) for details.
 
-the bot needs environment variables if you want it to do stuff:
+the bot needs a few environment variables to be set if you want it to do stuff:
 
 - `MASTODON_TOKEN`: a Mastodon user API token
-- `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_KEY`, and
-  `TWITTER_ACCESS_SECRET`: you need all of these to make a tweet.
+- ~~`TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_KEY`, and
+  `TWITTER_ACCESS_SECRET`: you need all of these to make a tweet.~~ no longer
+  used.
 - `DATA_DIR`: the directory in which to search for cat parts and store data on
   which words have been used recently. (default: 'data', already provided
   locally)
-- `CRON_RULE`: the interval between each post, in crontab format. (default:
-  every four hours)
 
 additionally, `MASTODON_SERVER` (hardcoded in [src/env.ts](src/env.ts)) controls
 the mastodon instance to which API calls should be made (usually where the bot

@@ -10,14 +10,7 @@ import { makeStatus } from "./text";
 
 import { CatParts } from "./cat-config";
 import { randomInt, randomByWeight } from "./util";
-import {
-  MASTODON_SERVER,
-  MASTODON_TOKEN,
-  TWITTER_API_KEY,
-  TWITTER_API_SECRET,
-  TWITTER_ACCESS_TOKEN,
-  TWITTER_ACCESS_SECRET,
-} from "./env";
+import { MASTODON_SERVER, MASTODON_TOKEN } from "./env";
 
 async function makeTwoot() {
   const sizeChance = Math.random();
@@ -95,35 +88,16 @@ async function doTwoot(): Promise<void> {
   const { status, image } = await makeTwoot();
   const filename = await writeToFile(image);
 
-  const [mastoResult, twitterResult] = await twoot(
+  const mastoResult = await twoot(
     { status, media: [{ path: filename }] },
-    [
-      {
-        type: "mastodon",
-        server: MASTODON_SERVER,
-        token: MASTODON_TOKEN,
-      },
-      {
-        type: "twitter",
-        apiKey: TWITTER_API_KEY,
-        apiSecret: TWITTER_API_SECRET,
-        accessToken: TWITTER_ACCESS_TOKEN,
-        accessSecret: TWITTER_ACCESS_SECRET,
-      },
-    ]
+    {
+      type: "mastodon",
+      server: MASTODON_SERVER,
+      token: MASTODON_TOKEN,
+    },
   );
 
-  if (mastoResult.type === "error") {
-    console.error(mastoResult.message);
-  } else {
-    console.log(mastoResult.message);
-  }
-
-  if (twitterResult.type === "error") {
-    console.error(twitterResult.message);
-  } else {
-    console.log(twitterResult.message);
-  }
+  console.log(`tooted at ${mastoResult.status.url}`);
 }
 
 if (process.argv.slice(2).includes("local")) {
