@@ -17,7 +17,6 @@ export function escapeForRegex(expression: string): string {
 }
 
 /** Returns a random number between min (inclusive) and max (inclusive). */
-// eslint-disable-next-line @typescript-eslint/unified-signatures
 export function randomFloat(min: number, max: number): number;
 export function randomFloat(max: number): number;
 export function randomFloat(min: number, max?: number): number {
@@ -35,7 +34,6 @@ export function randomFloat(min: number, max?: number): number {
 }
 
 /** Returns a random number between min (inclusive) and max (exclusive). */
-// eslint-disable-next-line @typescript-eslint/unified-signatures
 export function randomInt(min: number, max: number): number;
 export function randomInt(max: number): number;
 export function randomInt(min: number, max?: number): number {
@@ -95,11 +93,11 @@ export interface WeightedValues {
   [value: string]: number;
 }
 export function randomByWeight<T extends WeightedValues, K extends keyof T>(
-  weights: T
+  weights: T,
 ): K;
 export function randomByWeight<T>(weights: [T, number][] | Map<T, number>): T;
 export function randomByWeight(
-  weights: [any, number][] | Map<any, number> | WeightedValues
+  weights: [any, number][] | Map<any, number> | WeightedValues,
 ): any {
   const weightPairs: [any, number][] =
     weights instanceof Map
@@ -137,7 +135,7 @@ export function randomByWeight(
  * saturation and value.
  */
 export function rgbToHSV(
-  rgb: [number, number, number]
+  rgb: [number, number, number],
 ): [number, number, number] {
   const r = clamp(rgb[0] / 255, 0, 1);
   const g = clamp(rgb[1] / 255, 0, 1);
@@ -183,7 +181,7 @@ export function rgbToHSV(
  * @returns A tuple with values in the interval [0-255].
  */
 export function hsvToRGB(
-  hsv: [number, number, number]
+  hsv: [number, number, number],
 ): [number, number, number] {
   const h = wrap(hsv[0], 360) / 60;
   const s = clamp(hsv[1], 0, 100) / 100;

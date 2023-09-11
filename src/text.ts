@@ -41,27 +41,27 @@ function an(word: string) {
 function randomBagPreferred(
   arr: string[],
   preferred: string,
-  count = 1
+  count = 1,
 ): string[] {
   const results = [
     ...randomBag(
       arr.filter((a) => a.toLowerCase().startsWith(preferred[0].toLowerCase())),
-      count
+      count,
     ),
   ];
   if (results.length < count) {
     results.push(
       ...randomBag(
         arr.filter(
-          (a) => !a.toLowerCase().startsWith(preferred[0].toLowerCase())
+          (a) => !a.toLowerCase().startsWith(preferred[0].toLowerCase()),
         ),
-        count - results.length
-      )
+        count - results.length,
+      ),
     );
   }
   if (results.length < count) {
     console.warn(
-      `not enough results! wanted: ${count} with preferred prefix ${preferred}, ${arr.length} results available`
+      `not enough results! wanted: ${count} with preferred prefix ${preferred}, ${arr.length} results available`,
     );
   }
   return results;
@@ -102,7 +102,7 @@ export function makeStatus(catsMade: number): string {
     : randomBag(adjs, adjCount);
 
   let adj = chosenAdjs.join(
-    adjCount === 2 && Math.random() < 0.5 ? " and " : ", "
+    adjCount === 2 && Math.random() < 0.5 ? " and " : ", ",
   );
 
   if (adjCount === 1 && Math.random() < 0.1) {

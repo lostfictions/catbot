@@ -53,7 +53,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
       const prefix = prefixes.find((p) => fn.startsWith(p));
       if (!prefix) {
         console.warn(
-          `Filename pattern doesn't match any known part prefix: '${fn}'`
+          `Filename pattern doesn't match any known part prefix: '${fn}'`,
         );
       } else {
         const sprite = await Jimp.read(join(PARTS_DIR, fn));
@@ -66,7 +66,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
           throw new Error(
             `Inconsistent sprite size:\n` +
               `Expected '${fn}' to be [${spriteSize.join(", ")}],\n` +
-              `instead got [${width}, ${height}]`
+              `instead got [${width}, ${height}]`,
           );
         }
 
@@ -94,7 +94,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
           throw new Error(
             `Inconsistent sprite size:\n` +
               `Expected '${fn}' to be [${spriteSize!.join(", ")}],\n` +
-              `instead got [${width}, ${height}]`
+              `instead got [${width}, ${height}]`,
           );
         }
 
@@ -155,7 +155,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
 export async function renderToImage(
   grid: CatParts[][],
   params: CatConfig,
-  specialPos?: [number, number]
+  specialPos?: [number, number],
 ): Promise<Jimp> {
   const {
     parts,
@@ -252,7 +252,7 @@ export async function renderToImage(
   const bg: Jimp = new (Jimp as any)(
     dest.bitmap.width,
     dest.bitmap.height,
-    bgCol
+    bgCol,
   );
 
   // don't make a silhouette if we're transparent!
@@ -309,7 +309,7 @@ export async function renderToImage(
   dest.setPixelColor(
     Jimp.rgbaToInt(pixCol.r, pixCol.g, pixCol.b, pixCol.a - 1),
     0,
-    0
+    0,
   );
 
   return dest;

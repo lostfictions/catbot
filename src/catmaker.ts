@@ -51,7 +51,7 @@ const straightSegments = new Set([CatParts.UD, CatParts.LR]);
 function addCat(
   grid: CatParts[][],
   turnChance: TurnChance,
-  { minSteps, maxSteps, gridSizeX, gridSizeY }: CatConfig
+  { minSteps, maxSteps, gridSizeX, gridSizeY }: CatConfig,
 ): boolean {
   // search for an empty spot to put the cat.
   let attempts = 5;
@@ -194,7 +194,7 @@ function addCat(
         // log(`crossover! pos now [${x},${y}]`)
       } else {
         console.warn(
-          `Expected empty sprite at [${x},${y}], found ${grid[x][y]}`
+          `Expected empty sprite at [${x},${y}], found ${grid[x][y]}`,
         );
         break;
       }
