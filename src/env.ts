@@ -4,7 +4,6 @@ import fs from "fs";
 import { z, parseEnv } from "znv";
 
 import * as Sentry from "@sentry/node";
-import { CaptureConsole } from "@sentry/integrations";
 
 export const { PERSIST_DIR, MASTODON_TOKEN, SENTRY_DSN } = parseEnv(
   process.env,
@@ -39,7 +38,9 @@ if (!SENTRY_DSN && !isDev) {
     dsn: SENTRY_DSN,
     environment: isDev ? "dev" : "prod",
     integrations: [
-      new CaptureConsole({ levels: ["warn", "error", "debug", "assert"] }),
+      Sentry.captureConsoleIntegration({
+        levels: ["warn", "error", "debug", "assert"],
+      }),
     ],
   });
 }
