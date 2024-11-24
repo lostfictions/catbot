@@ -4,7 +4,7 @@ https://mastodon.social/@friends
 
 https://bsky.app/profile/catfriends.bsky.social
 
-a mastodon ~~and twitter~~ and bsky bot for node. toots ~~and tweets~~ and skeets very good friends.
+a mastodon and ~~twitter~~ bsky bot for node. toots and ~~tweets~~ skeets very good friends.
 
 > twitter support was removed in 2023 following twitter api changes which
 > resulted in the shutdown of most bots.
@@ -31,16 +31,12 @@ running `pnpm dev` will generate an image and save it to a file on your computer
 
 if you clone the repository you can run your own remixed version that posts to mastodon using github actions too! no need to edit the workflow file — you'll just need to set some environment variables in the github repository settings:
 
-- `MASTODON_TOKEN`: a Mastodon user API token (required)
+- `MASTODON_TOKEN`: a Mastodon user API token
 - `BSKY_USERNAME`: the bot's username on Bluesky
 - `BSKY_PASSWORD`: the app password for the bot's account on Bluesky
-- `DATA_DIR`: the directory in which to search for cat parts and store data on
-  which words have been used recently. (default: 'data', already provided
-  locally)
+- `PERSIST_DIR`: the directory in which to store data on which words have been used recently. (default: `persist`)
 
-additionally, `MASTODON_SERVER` (hardcoded in [src/env.ts](src/env.ts)) controls
-the mastodon instance to which API calls should be made (usually where the bot
-user lives.)
+additionally, `MASTODON_SERVER` (hardcoded in [src/env.ts](src/env.ts)) controls the mastodon instance to which API calls should be made (usually where the bot user lives.)
 
 this bot uses [dotenv](https://github.com/motdotla/dotenv), so if you're testing things locally, you can stick any of the above environment variables in a file named `.env` in the project root. (it's gitignored, so there's no risk of accidentally committing private API tokens you put in there.)
 
