@@ -5,21 +5,36 @@ import { z, parseEnv } from "znv";
 
 import * as Sentry from "@sentry/node";
 
-export const { PERSIST_DIR, MASTODON_TOKEN, SENTRY_DSN } = parseEnv(
-  process.env,
-  {
-    PERSIST_DIR: z.string().min(1).default("persist"),
-    MASTODON_TOKEN: {
-      schema: z.string().min(1),
-      defaults: {
-        development: "dev",
-      },
-    },
-    SENTRY_DSN: {
-      schema: z.string().min(1).optional(),
+export const {
+  PERSIST_DIR,
+  MASTODON_TOKEN,
+  BSKY_USERNAME,
+  BSKY_PASSWORD,
+  SENTRY_DSN,
+} = parseEnv(process.env, {
+  PERSIST_DIR: z.string().min(1).default("persist"),
+  MASTODON_TOKEN: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "dev",
     },
   },
-);
+  BSKY_USERNAME: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "unused",
+    },
+  },
+  BSKY_PASSWORD: {
+    schema: z.string().min(1),
+    defaults: {
+      development: "unused",
+    },
+  },
+  SENTRY_DSN: {
+    schema: z.string().min(1).optional(),
+  },
+});
 
 export const isDev = process.env["NODE_ENV"] !== "production";
 

@@ -10,7 +10,12 @@ import { makeStatus } from "./text";
 
 import { CatParts } from "./cat-config";
 import { randomInt, randomByWeight } from "./util";
-import { MASTODON_SERVER, MASTODON_TOKEN } from "./env";
+import {
+  BSKY_PASSWORD,
+  BSKY_USERNAME,
+  MASTODON_SERVER,
+  MASTODON_TOKEN,
+} from "./env";
 
 async function makeTwoot() {
   const sizeChance = Math.random();
@@ -88,16 +93,34 @@ async function doTwoot(): Promise<void> {
   const { status, image } = await makeTwoot();
   const filename = await writeToFile(image);
 
-  const mastoResult = await twoot(
-    { status, media: [{ path: filename }] },
+  const results = await twoot({ status, media: [{ path: filename }] }, [
     {
       type: "mastodon",
       server: MASTODON_SERVER,
       token: MASTODON_TOKEN,
     },
-  );
+    {
+      type: "bsky",
+      username: BSKY_USERNAME,
+      password: BSKY_PASSWORD,
+    },
+  ]);
 
-  console.log(`tooted at ${mastoResult.status.url}`);
+  for (const res of results) {
+    switch (res.type) {
+      case "mastodon":
+        console.log(`tooted at ${res.status.url}`);
+        break;
+      case "bsky":
+        console.log(`skeeted at ${res.status.uri}`);
+        break;
+      case "error":
+        console.error(`error while tooting:\n${res.message}`);
+        break;
+      default:
+        throw new Error(`unexpected value:\n${JSON.stringify(res)}`);
+    }
+  }
 }
 
 if (process.argv.slice(2).includes("local")) {
