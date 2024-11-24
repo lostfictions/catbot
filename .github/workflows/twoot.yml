@@ -9,8 +9,8 @@ jobs:
   scheduled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
         with:
           # disjoint branch with "unused concept" data
           ref: "persist"
@@ -18,7 +18,7 @@ jobs:
       - uses: pnpm/action-setup@ac5bf11548bf5e19b8aadb8182072616590fa4a6
         with:
           run_install: false
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # 4.1.0
         with:
           node-version-file: ".node-version"
           cache: "pnpm"
