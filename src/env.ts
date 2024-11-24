@@ -1,9 +1,13 @@
 /* eslint-disable node/no-process-env */
 import fs from "fs";
-
 import { z, parseEnv } from "znv";
-
 import * as Sentry from "@sentry/node";
+
+export const isDev = process.env["NODE_ENV"] !== "production";
+
+if (isDev) {
+  require("dotenv").config();
+}
 
 export const {
   PERSIST_DIR,
@@ -35,8 +39,6 @@ export const {
     schema: z.string().min(1).optional(),
   },
 });
-
-export const isDev = process.env["NODE_ENV"] !== "production";
 
 if (!fs.existsSync(PERSIST_DIR)) {
   throw new Error(`Persistence directory '${PERSIST_DIR}' doesn't exist!`);
