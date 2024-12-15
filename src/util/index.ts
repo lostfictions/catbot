@@ -89,24 +89,21 @@ export function pluck<T>(arr: T[], count: number): T[] {
   return pluckedValues;
 }
 
-export interface WeightedValues {
-  [value: string]: number;
-}
-export function randomByWeight<T extends WeightedValues, K extends keyof T>(
+export function randomByWeight<T extends Record<string, number>>(
   weights: T,
-): K;
+): keyof T;
 export function randomByWeight<T>(weights: [T, number][] | Map<T, number>): T;
-export function randomByWeight(
-  weights: [any, number][] | Map<any, number> | WeightedValues,
-): any {
-  const weightPairs: [any, number][] =
+export function randomByWeight<T>(
+  weights: [T, number][] | Map<T, number> | Record<string, number>,
+): T | string {
+  const weightPairs: [T | string, number][] =
     weights instanceof Map
       ? [...weights.entries()]
       : Array.isArray(weights)
         ? weights
         : Object.entries(weights);
 
-  const keys: any[] = [];
+  const keys: (T | string)[] = [];
   const values: number[] = [];
   for (const [k, v] of weightPairs) {
     keys.push(k);
@@ -117,7 +114,9 @@ export function randomByWeight(
     if (c < 0) throw new Error("Negative weight!");
     return p + c;
   }, 0);
+
   if (sum === 0) throw new Error("Weights add up to zero!");
+
   const choose = Math.floor(Math.random() * sum);
 
   for (let i = 0, count = 0; i < keys.length; i++) {

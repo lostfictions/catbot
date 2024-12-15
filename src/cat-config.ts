@@ -9,18 +9,20 @@ export interface CatConfig {
   gridSizeY: number;
 }
 
-export const enum CatParts {
-  Empty = " ",
-  UD = "│",
-  LR = "─",
-  UL = "┘",
-  UR = "└",
-  DL = "┐",
-  DR = "┌",
-  Cross = "┼",
-  Start = "X",
-  EndR = ">",
-  EndU = "^",
-  EndL = "<",
-  EndD = "v",
-}
+export const catParts = {
+  Empty: " ",
+  UD: "│",
+  LR: "─",
+  UL: "┘",
+  UR: "└",
+  DL: "┐",
+  DR: "┌",
+  Cross: "┼",
+  Start: "X",
+  EndR: ">",
+  EndU: "^",
+  EndL: "<",
+  EndD: "v",
+} as const;
+
+export type CatPart = (typeof catParts)[keyof typeof catParts];

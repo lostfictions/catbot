@@ -3,19 +3,19 @@ import { setTimeout } from "timers/promises";
 import { twoot } from "twoot";
 import { close as flushSentry } from "@sentry/node";
 
-import { makeCat } from "./catmaker";
-import { renderToImage } from "./render-to-image";
-import { writeToFile } from "./write-image-to-file";
-import { makeStatus } from "./text";
+import { makeCat } from "./catmaker.ts";
+import { renderToImage } from "./render-to-image.ts";
+import { writeToFile } from "./write-image-to-file.ts";
+import { makeStatus } from "./text.ts";
 
-import { CatParts } from "./cat-config";
-import { randomInt, randomByWeight } from "./util";
+import { catParts } from "./cat-config.ts";
+import { randomInt, randomByWeight } from "./util/index.ts";
 import {
   BSKY_PASSWORD,
   BSKY_USERNAME,
   MASTODON_SERVER,
   MASTODON_TOKEN,
-} from "./env";
+} from "./env.ts";
 
 async function makeTwoot() {
   const sizeChance = Math.random();
@@ -73,8 +73,8 @@ async function makeTwoot() {
   if (Math.random() < 0.005) {
     for (let y = 0; y < config.gridSizeY; y++) {
       for (let x = 0; x < config.gridSizeX - 1; x++) {
-        const empty1 = grid[x][config.gridSizeY - y - 1] === CatParts.Empty;
-        const empty2 = grid[x + 1][config.gridSizeY - y - 1] === CatParts.Empty;
+        const empty1 = grid[x][config.gridSizeY - y - 1] === catParts.Empty;
+        const empty2 = grid[x + 1][config.gridSizeY - y - 1] === catParts.Empty;
         if (!specialPosition && empty1 && empty2 && Math.random() < 0.0001) {
           specialPosition = [x, y];
         }

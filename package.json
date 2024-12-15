@@ -5,11 +5,11 @@
   "author": "s <https://github.com/lostfictions>",
   "license": "AGPL-3.0",
   "description": "a bot that posts cats on both twitter and mastodon.",
-  "main": "dist/main.js",
+  "type": "module",
+  "main": "src/main.ts",
   "scripts": {
-    "start": "NODE_ENV=production node --enable-source-maps dist/main.js",
-    "dev": "NODE_ENV=development ts-node -T src/main.ts -- local",
-    "build": "rm -rf dist/ && tsc",
+    "start": "NODE_ENV=production node --experimental-strip-types src/main.ts",
+    "dev": "NODE_ENV=development node --experimental-strip-types src/main.ts -- local",
     "test": "run-p -cl test:*",
     "test:ts": "tsc --noEmit",
     "test:eslint": "eslint --color 'src/**/*'",
@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "@sentry/integrations": "^7.114.0",
-    "@sentry/node": "^8.40.0",
-    "dotenv": "^16.4.5",
+    "@sentry/node": "^8.45.0",
+    "dotenv": "^16.4.7",
     "jimp": "^0.2.28",
     "pluralize": "^8.0.0",
     "twoot": "0.4.0",
@@ -29,16 +29,15 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@types/node": "^20.17.7",
-    "@types/pluralize": "^0.0.29",
-    "eslint": "^8.57.1",
-    "eslint-config-lostfictions": "^6.1.0",
-    "fast-check": "^3.23.1",
+    "@types/node": "^22.10.2",
+    "@types/pluralize": "^0.0.33",
+    "eslint": "^9.17.0",
+    "eslint-config-lostfictions": "7.0.0-alpha.7",
+    "fast-check": "^3.23.2",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.3.3",
-    "ts-node": "^10.9.2",
+    "prettier": "^3.4.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.5"
+    "vitest": "^2.1.8"
   },
   "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247"
 }

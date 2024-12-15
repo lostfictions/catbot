@@ -1,30 +1,40 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument,
+   @typescript-eslint/no-unsafe-member-access,
+   @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+   -- jimp sux
+*/
 import fs from "fs";
 import { join, parse as parsePath } from "path";
 
 import Jimp from "jimp";
 
-import { randomInArray, randomInt, randomFloat, hsvToRGB } from "./util";
-import { CatParts, CatConfig } from "./cat-config";
+import {
+  randomInArray,
+  randomInt,
+  randomFloat,
+  hsvToRGB,
+} from "./util/index.ts";
+import { catParts, type CatConfig, type CatPart } from "./cat-config.ts";
 
 const OVERLAYS_DIR = "data/overlays";
 const PARTS_DIR = "data/parts";
 const PALETTE_PATH = "data/palette.png";
 const SPECIAL_PATH = "data/mercat.png";
 
-const filenameToPart: { [pattern: string]: CatParts } = {
-  empty: CatParts.Empty,
-  ud: CatParts.UD,
-  lr: CatParts.LR,
-  ul: CatParts.UL,
-  ur: CatParts.UR,
-  dl: CatParts.DL,
-  dr: CatParts.DR,
-  cross: CatParts.Cross,
-  butt: CatParts.Start,
-  "head-r": CatParts.EndR,
-  "head-u": CatParts.EndU,
-  "head-l": CatParts.EndL,
-  "head-d": CatParts.EndD,
+const filenameToPart: { [pattern: string]: CatPart } = {
+  empty: catParts.Empty,
+  ud: catParts.UD,
+  lr: catParts.LR,
+  ul: catParts.UL,
+  ur: catParts.UR,
+  dl: catParts.DL,
+  dr: catParts.DR,
+  cross: catParts.Cross,
+  butt: catParts.Start,
+  "head-r": catParts.EndR,
+  "head-u": catParts.EndU,
+  "head-l": catParts.EndL,
+  "head-d": catParts.EndD,
 };
 
 let cachedSprites: {
@@ -139,7 +149,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
 
     const special = await Jimp.read(SPECIAL_PATH);
 
-    // eslint-disable-next-line require-atomic-updates
+    // eslint-disable-next-line require-atomic-updates -- false poz
     cachedSprites = {
       parts,
       overlays,
@@ -153,7 +163,7 @@ async function loadSprites(): Promise<typeof cachedSprites> {
 }
 
 export async function renderToImage(
-  grid: CatParts[][],
+  grid: CatPart[][],
   params: CatConfig,
   specialPos?: [number, number],
 ): Promise<Jimp> {

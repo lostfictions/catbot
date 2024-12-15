@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 
 import fc from "fast-check";
 
-import { randomByWeight, hsvToRGB } from "./index";
+import { randomByWeight, hsvToRGB } from "./index.ts";
 
-function pairsToObj<T>(pairs: [string, T][]): { [k: string]: T } {
-  const res: any = {};
+function pairsToObj<T>(pairs: [string, T][]) {
+  const res: Record<string, T> = {};
   for (const [k, v] of pairs) {
     res[k] = v;
   }
@@ -14,28 +14,30 @@ function pairsToObj<T>(pairs: [string, T][]): { [k: string]: T } {
 
 describe("random by weight", () => {
   it("returns one of the inputs", () => {
-    fc.assert(
-      fc.property(
-        fc.array(
-          fc.tuple(
-            fc.string(),
-            fc.float({
-              min: 0,
-              minExcluded: true,
-              noDefaultInfinity: true,
-              noNaN: true,
-            }),
+    expect(() =>
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.tuple(
+              fc.string(),
+              fc.float({
+                min: 0,
+                minExcluded: true,
+                noDefaultInfinity: true,
+                noNaN: true,
+              }),
+            ),
+            {
+              minLength: 1,
+            },
           ),
-          {
-            minLength: 1,
+          (arrayOfWeights) => {
+            const keys = new Set(arrayOfWeights.map(([k]) => k));
+            return keys.has(randomByWeight(pairsToObj(arrayOfWeights)));
           },
         ),
-        (arrayOfWeights) => {
-          const keys = new Set(arrayOfWeights.map(([k]) => k));
-          return keys.has(randomByWeight(pairsToObj(arrayOfWeights)));
-        },
       ),
-    );
+    ).not.toThrow();
   });
 
   it("does not throw when using integer weights", () => {
@@ -121,10 +123,12 @@ describe("hsv to rgb", () => {
       fc.float({ noDefaultInfinity: true, noNaN: true }),
     );
 
-    fc.assert(
-      fc.property(hsvTuple, (hsv) =>
-        hsvToRGB(hsv).every((v) => v >= 0 && v <= 255),
+    expect(() =>
+      fc.assert(
+        fc.property(hsvTuple, (hsv) =>
+          hsvToRGB(hsv).every((v) => v >= 0 && v <= 255),
+        ),
       ),
-    );
+    ).not.toThrow();
   });
 });

@@ -22,8 +22,7 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: pnpm install --prod --frozen-lockfile
       - run: pnpm start
         env:
           DATA_DIR: "persist"

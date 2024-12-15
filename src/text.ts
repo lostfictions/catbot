@@ -2,8 +2,8 @@ import fs from "fs";
 import path from "path";
 import pluralize from "pluralize";
 
-import { randomInArray, randomBag, pluckOne } from "./util";
-import { PERSIST_DIR } from "./env";
+import { randomInArray, randomBag, pluckOne } from "./util/index.ts";
+import { PERSIST_DIR } from "./env.ts";
 
 const catWordsBagFile = path.join(PERSIST_DIR, "cat-words-bag");
 

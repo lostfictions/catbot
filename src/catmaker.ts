@@ -1,10 +1,10 @@
-import { randomByWeight, randomInt } from "./util";
-import { CatParts, CatConfig } from "./cat-config";
+import { randomByWeight, randomInt } from "./util/index.ts";
+import { catParts, type CatConfig, type CatPart } from "./cat-config.ts";
 
 // Lookup table mapping from directions [right, up, left, down]
 // to parts to use and position delta to apply.
 interface CatDirection {
-  part: CatParts;
+  part: CatPart;
   delta: [number, number];
 }
 const directions: {
@@ -14,27 +14,27 @@ const directions: {
 }[] = [
   // facing right
   {
-    f: { part: CatParts.LR, delta: [1, 0] },
-    l: { part: CatParts.UL, delta: [0, 1] },
-    r: { part: CatParts.DL, delta: [0, -1] },
+    f: { part: catParts.LR, delta: [1, 0] },
+    l: { part: catParts.UL, delta: [0, 1] },
+    r: { part: catParts.DL, delta: [0, -1] },
   },
   // facing up
   {
-    f: { part: CatParts.UD, delta: [0, 1] },
-    l: { part: CatParts.DL, delta: [-1, 0] },
-    r: { part: CatParts.DR, delta: [1, 0] },
+    f: { part: catParts.UD, delta: [0, 1] },
+    l: { part: catParts.DL, delta: [-1, 0] },
+    r: { part: catParts.DR, delta: [1, 0] },
   },
   // facing left
   {
-    f: { part: CatParts.LR, delta: [-1, 0] },
-    l: { part: CatParts.DR, delta: [0, -1] },
-    r: { part: CatParts.UR, delta: [0, 1] },
+    f: { part: catParts.LR, delta: [-1, 0] },
+    l: { part: catParts.DR, delta: [0, -1] },
+    r: { part: catParts.UR, delta: [0, 1] },
   },
   // facing down
   {
-    f: { part: CatParts.UD, delta: [0, -1] },
-    l: { part: CatParts.UR, delta: [1, 0] },
-    r: { part: CatParts.UL, delta: [-1, 0] },
+    f: { part: catParts.UD, delta: [0, -1] },
+    l: { part: catParts.UR, delta: [1, 0] },
+    r: { part: catParts.UL, delta: [-1, 0] },
   },
 ];
 
@@ -46,10 +46,10 @@ interface TurnChance {
 
 const startDirection = 1;
 
-const straightSegments = new Set([CatParts.UD, CatParts.LR]);
+const straightSegments = new Set<CatPart>([catParts.UD, catParts.LR]);
 
 function addCat(
-  grid: CatParts[][],
+  grid: CatPart[][],
   turnChance: TurnChance,
   { minSteps, maxSteps, gridSizeX, gridSizeY }: CatConfig,
 ): boolean {
@@ -64,13 +64,13 @@ function addCat(
     if (attempts === 0) {
       return false;
     }
-  } while (grid[x][y] !== CatParts.Empty || grid[x][y + 1] !== CatParts.Empty);
+  } while (grid[x][y] !== catParts.Empty || grid[x][y + 1] !== catParts.Empty);
 
   // we can infer previous steps if we need to backtrack, but this is simpler
   const steps: { prevSprite: string; delta: [number, number] }[] = [];
 
   // lay initial sprite.
-  grid[x][y] = CatParts.Start;
+  grid[x][y] = catParts.Start;
   y += 1;
   let dir = startDirection;
 
@@ -111,13 +111,15 @@ function addCat(
         y + dY >= gridSizeY - 1
       ) {
         // log(`deleting ${nextDir}`)
-        delete (validTurns as any)[nextDir];
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete (validTurns as Record<string, number>)[nextDir];
         continue;
       }
 
       // if the cell is occupied and we're not going forward, this isn't a valid direction.
-      if (grid[x + dX][y + dY] !== CatParts.Empty && nextDir !== "f") {
-        delete (validTurns as any)[nextDir];
+      if (grid[x + dX][y + dY] !== catParts.Empty && nextDir !== "f") {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete (validTurns as Record<string, number>)[nextDir];
         continue;
       }
 
@@ -139,7 +141,7 @@ function addCat(
           break;
         }
         // if it's an empty space above, we can go in that direction.
-        if (grid[xToCheck][yToCheck] === CatParts.Empty) break;
+        if (grid[xToCheck][yToCheck] === catParts.Empty) break;
         // if it's anything except an empty space or a straight segment, we
         // can't go in that direction.
         if (!straightSegments.has(grid[xToCheck][yToCheck])) {
@@ -150,7 +152,8 @@ function addCat(
         // space in that direction.
       } while (true); // eslint-disable-line no-constant-condition
       if (shouldDelete) {
-        delete (validTurns as any)[nextDir];
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete (validTurns as Record<string, number>)[nextDir];
       }
     }
 
@@ -182,12 +185,12 @@ function addCat(
     }
 
     // we should only have been placed in a non-empty cell if we're doing a crossover
-    while (grid[x][y] !== CatParts.Empty) {
+    while (grid[x][y] !== catParts.Empty) {
       if (
         ((dir === 1 || dir === 3) && grid[x][y] === directions[0].f.part) ||
         ((dir === 0 || dir === 2) && grid[x][y] === directions[1].f.part)
       ) {
-        grid[x][y] = CatParts.Cross;
+        grid[x][y] = catParts.Cross;
         const [dX, dY] = directions[dir].f.delta;
         x += dX;
         y += dY;
@@ -204,16 +207,16 @@ function addCat(
 
   switch (dir) {
     case 0:
-      grid[x][y] = CatParts.EndR;
+      grid[x][y] = catParts.EndR;
       break;
     case 1:
-      grid[x][y] = CatParts.EndU;
+      grid[x][y] = catParts.EndU;
       break;
     case 2:
-      grid[x][y] = CatParts.EndL;
+      grid[x][y] = catParts.EndL;
       break;
     case 3:
-      grid[x][y] = CatParts.EndD;
+      grid[x][y] = catParts.EndD;
       break;
     default:
       throw new Error("unknown direction");
@@ -224,7 +227,7 @@ function addCat(
 export type CatOptions = Partial<CatConfig>;
 
 export function* makeCat(config: CatOptions = {}): IterableIterator<{
-  grid: CatParts[][];
+  grid: CatPart[][];
   catsMade: number;
   config: CatConfig;
 }> {
@@ -249,9 +252,9 @@ export function* makeCat(config: CatOptions = {}): IterableIterator<{
   if (finalConfig.rightChance > 0) turnChance.r = finalConfig.rightChance;
   if (finalConfig.straightChance > 0) turnChance.f = finalConfig.straightChance;
 
-  const grid: CatParts[][] = [];
+  const grid: CatPart[][] = [];
   for (let i = 0; i < finalConfig.gridSizeX; i++) {
-    grid[i] = Array<CatParts>(finalConfig.gridSizeY).fill(CatParts.Empty);
+    grid[i] = Array<CatPart>(finalConfig.gridSizeY).fill(catParts.Empty);
   }
 
   let lastAddSucceeded = addCat(grid, turnChance, finalConfig);
