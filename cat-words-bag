@@ -3,7 +3,6 @@ creature
 idler
 puss
 being
-daemon
 hunter
 pet
 tomcat
